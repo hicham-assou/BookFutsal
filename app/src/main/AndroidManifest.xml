@@ -4,6 +4,8 @@
 
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.INTERNET" />
+
 
     <application
         android:allowBackup="true"
@@ -15,12 +17,6 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.BookFutsal"
         tools:targetApi="33">
-
-
-        <meta-data
-            android:name="com.google.android.geo.API_KEY"
-            android:value="YOUR_API_KEY" />
-
         <activity
             android:name=".activities.MainActivity"
             android:exported="true">
@@ -31,8 +27,8 @@
             </intent-filter>
 
             <meta-data
-                android:name="android.app.lib_name"
-                android:value="" />
+                android:name="com.google.android.geo.API_KEY"
+                android:value="VOTRE_CLE_API"/>
         </activity>
     </application>
 

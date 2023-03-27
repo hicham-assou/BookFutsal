@@ -2,66 +2,51 @@ package com.example.bookfutsal.activities;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 
-import android.content.pm.PackageManager;
-import android.location.Location;
 import android.os.Bundle;
 
 import com.example.bookfutsal.R;
-import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.maps.CameraUpdateFactory;
+import com.example.bookfutsal.models.SportCenter;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
-    private FusedLocationProviderClient mFusedLocationClient;
-    private Location mCurrentLocation;
-    private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
+    private List<SportCenter> mSportCenters = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
+
+        // Créer des instances de SportCenter pour les centres sportifs
+        mSportCenters.add(new SportCenter("Centre sportif 1", 48.8534, 2.3488));
+        mSportCenters.add(new SportCenter("Centre sportif 2", 48.8606, 2.3376));
+        mSportCenters.add(new SportCenter("Centre sportif 3", 48.8759, 2.3543));
+
+        // Obtenir la carte depuis la vue XML
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
     }
 
     @Override
-    public void onMapReady(@NonNull GoogleMap googleMap) {
+    public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
-        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            mMap.setMyLocationEnabled(true);
-            mMap.getUiSettings().setMyLocationButtonEnabled(true);
-            mFusedLocationClient.getLastLocation().addOnSuccessListener(this, location -> {
-                if (location != null) {
-                    mCurrentLocation = location;
-                    LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
-                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 14));
-                    // Ajouter des marqueurs pour les centres sportifs autour de la position actuelle
-                    addSportsCentersMarkers();
-                }
-            });
-        } else {
-            // La permission n'est pas encore accordée, vous devez la demander à l'utilisateur
-            ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_PERMISSION_REQUEST_CODE);
+        // Ajouter un marqueur pour chaque centre sportif
+        for (SportCenter center : mSportCenters) {
+            LatLng location = new LatLng(center.getLatitude(), center.getLongitude());
+            mMap.addMarker(new MarkerOptions()
+                    .position(location)
+                    .title(center.getNameCenter()));
         }
-
-    }
-
-    private void addSportsCentersMarkers() {
-        // Récupérer les centres sportifs autour de la position actuelle à l'aide d'une API ou d'une base de données
-        // Boucler sur la liste des centres sportifs pour ajouter des marqueurs sur la carte
-        LatLng sportsCenterLatLng = new LatLng(sportsCenter.getLatitude(), sportsCenter.getLongitude());
-        mMap.addMarker(new MarkerOptions().position(sportsCenterLatLng).title(sportsCenter.getName()));
     }
 }
