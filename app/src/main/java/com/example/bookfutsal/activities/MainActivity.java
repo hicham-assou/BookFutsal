@@ -7,6 +7,7 @@ import android.os.Bundle;
 
 import com.example.bookfutsal.R;
 import com.example.bookfutsal.models.SportCenter;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
@@ -18,7 +19,7 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
 
-    private GoogleMap mMap;
+    private GoogleMap map;
     private List<SportCenter> mSportCenters = new ArrayList<>();
 
     @Override
@@ -27,26 +28,38 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         setContentView(R.layout.activity_main);
 
         // Créer des instances de SportCenter pour les centres sportifs
-        mSportCenters.add(new SportCenter("Centre sportif 1", 48.8534, 2.3488));
-        mSportCenters.add(new SportCenter("Centre sportif 2", 48.8606, 2.3376));
-        mSportCenters.add(new SportCenter("Centre sportif 3", 48.8759, 2.3543));
+        mSportCenters.add(new SportCenter("Centre sportif 1", 50.8466, 4.3528));
+        mSportCenters.add(new SportCenter("Centre sportif 2", 50.8951, 4.3414));
+        mSportCenters.add(new SportCenter("Centre sportif 3", 50.8463, 4.3614));
+
+        System.out.println("centre ajouter a la liste");
 
         // Obtenir la carte depuis la vue XML
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
-        mapFragment.getMapAsync(this);
+        if (mapFragment != null)
+            mapFragment.getMapAsync(this);
+
     }
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        mMap = googleMap;
+        map = googleMap;
+
 
         // Ajouter un marqueur pour chaque centre sportif
+        // https://www.youtube.com/watch?v=Xqyp77oMwO8
         for (SportCenter center : mSportCenters) {
             LatLng location = new LatLng(center.getLatitude(), center.getLongitude());
-            mMap.addMarker(new MarkerOptions()
+            map.addMarker(new MarkerOptions()
                     .position(location)
                     .title(center.getNameCenter()));
+
+            // pour zoomer sur la partie qui nous interesse
+            map.moveCamera(CameraUpdateFactory.newLatLng(location));
+            map.moveCamera(CameraUpdateFactory.zoomTo(10f));
+            map.animateCamera(CameraUpdateFactory.zoomTo(10f));
+
         }
     }
 }

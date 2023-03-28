@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "299468983217",
+    "project_id": "bookfutsal-9b191",
+    "storage_bucket": "bookfutsal-9b191.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:299468983217:android:c047a3f2b4f490226b0b90",
+        "android_client_info": {
+          "package_name": "com.example.bookfutsal"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "299468983217-m6ehovfkpgkmd8uuqef2fjeqmbtla2vo.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCVEJtolQ84VfOlCj0ZqLVNdBoE68NEe8M"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "299468983217-m6ehovfkpgkmd8uuqef2fjeqmbtla2vo.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
