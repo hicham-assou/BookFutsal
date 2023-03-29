@@ -1,8 +1,11 @@
 package com.example.bookfutsal.activities;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 
 import com.example.bookfutsal.R;
@@ -12,6 +15,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.ArrayList;
@@ -21,6 +25,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private GoogleMap map;
     private List<SportCenter> mSportCenters = new ArrayList<>();
+    private AlertDialog.Builder markerDialogBuilder;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,9 +34,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         setContentView(R.layout.activity_main);
 
         // Créer des instances de SportCenter pour les centres sportifs
-        mSportCenters.add(new SportCenter("Centre sportif 1", 50.8466, 4.3528));
-        mSportCenters.add(new SportCenter("Centre sportif 2", 50.8951, 4.3414));
-        mSportCenters.add(new SportCenter("Centre sportif 3", 50.8463, 4.3614));
+        mSportCenters.add(new SportCenter(1,"Centre sportif 1", 50.8466, 4.3528, "rue du loisir, 24"));
+        mSportCenters.add(new SportCenter(2, "Centre sportif 2", 50.8951, 4.3414, "rue du bonheur, 24"));
+        mSportCenters.add(new SportCenter(3, "Centre sportif 3", 50.8463, 4.3614, "rue du piers, 24"));
 
         System.out.println("centre ajouter a la liste");
 
@@ -45,15 +51,44 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     public void onMapReady(GoogleMap googleMap) {
         map = googleMap;
-
+        markerDialogBuilder = new AlertDialog.Builder(this);
 
         // Ajouter un marqueur pour chaque centre sportif
-        // https://www.youtube.com/watch?v=Xqyp77oMwO8
         for (SportCenter center : mSportCenters) {
             LatLng location = new LatLng(center.getLatitude(), center.getLongitude());
-            map.addMarker(new MarkerOptions()
+            MarkerOptions markerOptions = new MarkerOptions()
                     .position(location)
-                    .title(center.getNameCenter()));
+                    .title(center.getNameCenter())
+                    .snippet(String.valueOf(center.getId())); // Ajouter l'ID du centre sportif comme snippet
+            Marker marker = map.addMarker(markerOptions);
+            marker.setTag(center); // Ajouter le centre sportif comme tag du marqueur
+
+            // Créer un popup pour chaque marqueur
+            map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+                @Override
+                public boolean onMarkerClick(Marker marker) {
+                    SportCenter center = (SportCenter) marker.getTag(); // Récupérer le centre sportif à partir du tag du marqueur
+                    if (center != null) {
+                        markerDialogBuilder.setTitle(center.getNameCenter())
+                                .setMessage(center.getAdress())
+                                .setPositiveButton("ok", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        dialog.dismiss();
+                                    }
+                                })
+                                .setNegativeButton("plus de detail", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        Intent intent = new Intent(MainActivity.this, SportCenterDetail.class);
+                                        startActivity(intent);
+                                    }
+                                })
+                                .show();
+                    }
+                    return true;
+                }
+            });
 
             // pour zoomer sur la partie qui nous interesse
             map.moveCamera(CameraUpdateFactory.newLatLng(location));
@@ -62,4 +97,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         }
     }
+
+
 }
