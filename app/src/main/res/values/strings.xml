@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">BookFutsal</string>
+    <string name="app_name">Book Futsal</string>
     <string name="title_activity_maps_with_sports_centers">MapsActivityWithSportsCenters</string>
     <string name="google_map_api_key">AIzaSyBa-qewx23OavuQfHUbMcsJ6nBT00f13EU</string>
 </resources>
