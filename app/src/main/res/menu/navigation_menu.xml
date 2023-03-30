@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/menuProfile"
+        android:icon="@drawable/ic_baseline_insert_emoticon_24"
+        android:title="@string/profile">
+    </item>
+    <item
+        android:id="@+id/menuMyReservations"
+        android:icon="@drawable/ic_baseline_calendar_month_24"
+        android:title="@string/myReservations"></item>
+    <item
+        android:id="@+id/menuLogout"
+        android:icon="@drawable/ic_baseline_logout_24"
+        android:title="@string/logout">
+
+    </item>
+
+    <item
+        android:title="autres">
+        <menu>
+            <item
+                android:title="test1">
+            </item>
+            <item
+                android:title="test2">
+            </item>
+        </menu>
+    </item>
+</menu>
