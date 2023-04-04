@@ -6,12 +6,16 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
+import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import com.example.bookfutsal.R;
+import com.example.bookfutsal.databinding.ActivityMainBinding;
 import com.example.bookfutsal.models.SportCenter;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -27,6 +31,7 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
 
+    //private ActivityMainBinding binding;
     private GoogleMap map;
     private List<SportCenter> mSportCenters = new ArrayList<>();
     private AlertDialog.Builder markerDialogBuilder;
@@ -35,7 +40,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(R.layout.activity_main);
+
         //navbar
         DrawerLayout drawerLayout = findViewById(R.id.drawerLayout);
         findViewById(R.id.imageMenu).setOnClickListener(new View.OnClickListener() {
@@ -48,7 +55,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         NavigationView navigationView = findViewById(R.id.navigationView);
         navigationView.setItemIconTintList(null);
 
-        // Créer des instances de SportCenter pour les centres sportifs
+        // Créer les centres sportifs
         mSportCenters.add(new SportCenter(1,"Centre sportif 1", 50.8466, 4.3528, "rue du loisir, 24"));
         mSportCenters.add(new SportCenter(2, "Centre sportif 2", 50.8951, 4.3414, "rue du bonheur, 24"));
         mSportCenters.add(new SportCenter(3, "Centre sportif 3", 50.8463, 4.3614, "rue du piers, 24"));
@@ -61,7 +68,27 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         if (mapFragment != null)
             mapFragment.getMapAsync(this);
 
+
     }
+
+    // navigetion entre item
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        System.out.println("clique sur un item !!!!!!!!!!!!!");
+
+
+        if (id == R.id.menuMyReservations) {
+            System.out.println("clique sur reservation !!!!!!!!!!!!!");
+
+            Intent intent = new Intent(this, SportCenterDetail.class);
+            startActivity(intent);
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
