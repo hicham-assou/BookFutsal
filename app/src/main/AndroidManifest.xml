@@ -17,6 +17,27 @@
         android:theme="@style/Theme.BookFutsal"
         tools:targetApi="33">
         <activity
+            android:name=".activities.ProfileActivity"
+            android:exported="false">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
+        <activity
+            android:name=".activities.ReservationActivity"
+            android:exported="false">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
+        <activity
+            android:name=".activities.DrawerBaseActivity"
+            android:exported="false">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
+        <activity
             android:name=".activities.SportCenterDetail"
             android:exported="false">
             <meta-data

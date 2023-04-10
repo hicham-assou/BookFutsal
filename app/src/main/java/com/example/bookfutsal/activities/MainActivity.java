@@ -29,9 +29,9 @@ import com.google.android.material.navigation.NavigationView;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
+public class MainActivity extends DrawerBaseActivity implements OnMapReadyCallback {
 
-    //private ActivityMainBinding binding;
+    private ActivityMainBinding binding;
     private GoogleMap map;
     private List<SportCenter> mSportCenters = new ArrayList<>();
     private AlertDialog.Builder markerDialogBuilder;
@@ -40,11 +40,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //binding = ActivityMainBinding.inflate(getLayoutInflater());
-        setContentView(R.layout.activity_main);
+        binding = ActivityMainBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
+        allocateActivityTitle("Book Futsal");
 
         //navbar
-        DrawerLayout drawerLayout = findViewById(R.id.drawerLayout);
+        /*DrawerLayout drawerLayout = findViewById(R.id.drawerLayout);
         findViewById(R.id.imageMenu).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -53,7 +54,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         });
 
         NavigationView navigationView = findViewById(R.id.navigationView);
-        navigationView.setItemIconTintList(null);
+        navigationView.setItemIconTintList(null);*/
 
         // Créer les centres sportifs
         mSportCenters.add(new SportCenter(1,"Centre sportif 1", 50.8466, 4.3528, "rue du loisir, 24"));
@@ -70,26 +71,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
 
     }
-
-    // navigetion entre item
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        System.out.println("clique sur un item !!!!!!!!!!!!!");
-
-
-        if (id == R.id.menuMyReservations) {
-            System.out.println("clique sur reservation !!!!!!!!!!!!!");
-
-            Intent intent = new Intent(this, SportCenterDetail.class);
-            startActivity(intent);
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
-
     @Override
     public void onMapReady(GoogleMap googleMap) {
         map = googleMap;
