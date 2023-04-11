@@ -8,7 +8,6 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
 import android.content.Intent;
-import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -19,6 +18,7 @@ import com.google.android.material.navigation.NavigationView;
 public class DrawerBaseActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     DrawerLayout drawerLayout;
+    MenuItem menuLogin, menuProfile, menuLogout;
 
     @Override
     public void setContentView(View view) {
@@ -36,8 +36,21 @@ public class DrawerBaseActivity extends AppCompatActivity implements NavigationV
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.menu_drawer_open, R.string.menu_drawer_close);
         drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
+
+        menuLogin = navigationView.getMenu().findItem(R.id.menuLogin);
+        menuLogout = navigationView.getMenu().findItem(R.id.menuLogout);
+        menuProfile = navigationView.getMenu().findItem(R.id.menuProfile);
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        boolean isConnected = false;
+        menuLogin.setVisible(!isConnected);
+        menuLogout.setVisible(isConnected);
+        menuProfile.setVisible(isConnected);
+    }
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
@@ -50,6 +63,10 @@ public class DrawerBaseActivity extends AppCompatActivity implements NavigationV
                 break;
             case R.id.menuHome:
                 startActivity(new Intent(this, MainActivity.class));
+                overridePendingTransition(0, 0);
+                break;
+            case R.id.menuLogin:
+                startActivity(new Intent(this, SignInActivity.class));
                 overridePendingTransition(0, 0);
                 break;
         }

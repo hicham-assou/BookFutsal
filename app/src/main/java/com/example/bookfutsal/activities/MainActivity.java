@@ -44,18 +44,6 @@ public class MainActivity extends DrawerBaseActivity implements OnMapReadyCallba
         setContentView(binding.getRoot());
         allocateActivityTitle("Book Futsal");
 
-        //navbar
-        /*DrawerLayout drawerLayout = findViewById(R.id.drawerLayout);
-        findViewById(R.id.imageMenu).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                drawerLayout.openDrawer(GravityCompat.START);
-            }
-        });
-
-        NavigationView navigationView = findViewById(R.id.navigationView);
-        navigationView.setItemIconTintList(null);*/
-
         // Créer les centres sportifs
         mSportCenters.add(new SportCenter(1,"Centre sportif 1", 50.8466, 4.3528, "rue du loisir, 24"));
         mSportCenters.add(new SportCenter(2, "Centre sportif 2", 50.8951, 4.3414, "rue du bonheur, 24"));
@@ -68,6 +56,7 @@ public class MainActivity extends DrawerBaseActivity implements OnMapReadyCallba
                 .findFragmentById(R.id.map);
         if (mapFragment != null)
             mapFragment.getMapAsync(this);
+
 
 
     }

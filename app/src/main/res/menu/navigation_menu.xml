@@ -5,6 +5,7 @@
         android:icon="@drawable/ic_baseline_home_24"
         android:title="@string/home">
     </item>
+
     <item
         android:id="@+id/menuProfile"
         android:icon="@drawable/ic_baseline_insert_emoticon_24"
@@ -14,22 +15,25 @@
         android:id="@+id/menuMyReservations"
         android:icon="@drawable/ic_baseline_calendar_month_24"
         android:title="@string/myReservations"></item>
-    <item
-        android:id="@+id/menuLogout"
-        android:icon="@drawable/ic_baseline_logout_24"
-        android:title="@string/logout">
 
-    </item>
 
     <item
-        android:title="autres">
+        android:title="">
         <menu>
             <item
-                android:title="test1">
+                android:id="@+id/menuLogout"
+                android:icon="@drawable/ic_baseline_logout_24"
+                android:title="@string/logout">
+
             </item>
             <item
-                android:title="test2">
+                android:id="@+id/menuLogin"
+                android:icon="@drawable/ic_baseline_login_24"
+                android:title="@string/login">
             </item>
+
         </menu>
     </item>
+
+
 </menu>
