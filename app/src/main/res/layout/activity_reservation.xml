@@ -6,9 +6,21 @@
     android:layout_height="match_parent"
     tools:context=".activities.ReservationActivity">
 
-    <TextView
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="reservation"
-        android:gravity="center"></TextView>
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <GridLayout
+            android:id="@+id/gridLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="#A0C18A"
+            android:columnCount="7"
+            android:rowCount="24">
+
+        </GridLayout>
+    </ScrollView>
+
 </androidx.constraintlayout.widget.ConstraintLayout>
