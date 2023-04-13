@@ -2,9 +2,12 @@ package com.example.bookfutsal.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.GridLayout;
@@ -20,7 +23,7 @@ import com.example.bookfutsal.databinding.ActivityReservationBinding;
 public class ReservationActivity extends DrawerBaseActivity {
 
     private static final int ROW_COUNT = 24;
-    private static final int COLUMN_COUNT = 7;
+    private static final int COLUMN_COUNT = 3;
 
     private ActivityReservationBinding binding;
     @Override
@@ -30,33 +33,51 @@ public class ReservationActivity extends DrawerBaseActivity {
         setContentView(binding.getRoot());
         allocateActivityTitle("Reservations");
 
-        int hours = 0;
+        //ajouter titre aux lignes
 
+
+        //ajouter les textView
+        int hours = 0;
         for(int i=0; i<binding.gridLayout.getRowCount(); i++){
             for(int j=0; j<binding.gridLayout.getColumnCount(); j++){
-                Button button = new Button(this);
-                GridLayout.LayoutParams params = new GridLayout.LayoutParams();
-                params.columnSpec = GridLayout.spec(j);
-                params.rowSpec = GridLayout.spec(i);
-                button.setLayoutParams(params);
                 hours ++;
-                button.setText(hours+"h - "+ (hours+1) + "h");
-                binding.gridLayout.addView(button);
-                int finalI = i;
-                button.setOnClickListener(new View.OnClickListener() {
+                TextView textView = new TextView(this);
+                textView.setBackgroundColor(Color.GREEN);
+                GridLayout.LayoutParams params = new GridLayout.LayoutParams();
+                params.columnSpec = GridLayout.spec(j, 1f);
+                params.rowSpec = GridLayout.spec(i, 1f);
+                params.setMargins(8, 8, 8, 8); // Ajouter des marges
+                textView.setLayoutParams(params);
+                textView.setText(hours+"h - "+ (hours+1) + "h");
+                textView.setId(hours);
+                textView.setGravity(Gravity.CENTER); // Centrer le texte dans le TextView
+                binding.gridLayout.addView(textView);
+                int id = hours;
+                textView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        showToast("button "+ finalI);
+                        showToast("textView "+ id);
+                        textView.setBackgroundColor(Color.RED);
+                        AlertDialog.Builder builder = new AlertDialog.Builder(ReservationActivity.this);
+                        builder.setMessage("book on 12/10 from " + id + " to "+ (id + 1) +" ?")
+                                .setTitle("Reservation")
+                                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+                                        // Action à exécuter lorsque l'utilisateur appuie sur "OK"
+                                    }
+                                })
+                                .setNegativeButton("cancel", new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+                                        // Action à exécuter lorsque l'utilisateur appuie sur "Annuler"
+                                    }
+                                });
+                        AlertDialog dialog = builder.create();
+                        dialog.show();
                     }
                 });
             }
         }
-        DisplayMetrics displayMetrics = new DisplayMetrics();
-        getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
-        int screenWidth = displayMetrics.widthPixels;
-        int cellSize = screenWidth / 7; // 7 étant le nombre de colonnes de la grille
-        int numColumns = screenWidth / cellSize;
-        binding.gridLayout.setColumnCount(numColumns);
+
 
 
     }

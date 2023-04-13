@@ -89,10 +89,11 @@ public class MainActivity extends DrawerBaseActivity implements OnMapReadyCallba
                                         dialog.dismiss();
                                     }
                                 })
-                                .setNegativeButton("plus de detail", new DialogInterface.OnClickListener() {
+                                .setNegativeButton("more details", new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
                                         Intent intent = new Intent(MainActivity.this, SportCenterDetail.class);
+                                        intent.putExtra("center", center);
                                         startActivity(intent);
                                     }
                                 })
@@ -108,6 +109,10 @@ public class MainActivity extends DrawerBaseActivity implements OnMapReadyCallba
             map.animateCamera(CameraUpdateFactory.zoomTo(10f));
 
         }
+    }
+
+    public void showToast(String message){
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
 
 

@@ -1,6 +1,8 @@
 package com.example.bookfutsal.models;
 
-public class SportCenter {
+import java.io.Serializable;
+
+public class SportCenter implements Serializable {
     private int id;
     private String nameCenter, adress;
     private double latitude, longitude;
