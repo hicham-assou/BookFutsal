@@ -37,7 +37,7 @@ public class ReservationActivity extends DrawerBaseActivity {
 
 
         //ajouter les textView
-        int hours = 0;
+        int hours = 7;
         for(int i=0; i<binding.gridLayout.getRowCount(); i++){
             for(int j=0; j<binding.gridLayout.getColumnCount(); j++){
                 hours ++;
@@ -57,13 +57,12 @@ public class ReservationActivity extends DrawerBaseActivity {
                     @Override
                     public void onClick(View v) {
                         showToast("textView "+ id);
-                        textView.setBackgroundColor(Color.RED);
                         AlertDialog.Builder builder = new AlertDialog.Builder(ReservationActivity.this);
                         builder.setMessage("book on 12/10 from " + id + " to "+ (id + 1) +" ?")
                                 .setTitle("Reservation")
                                 .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog, int id) {
-                                        // Action à exécuter lorsque l'utilisateur appuie sur "OK"
+                                        textView.setBackgroundColor(Color.RED);
                                     }
                                 })
                                 .setNegativeButton("cancel", new DialogInterface.OnClickListener() {

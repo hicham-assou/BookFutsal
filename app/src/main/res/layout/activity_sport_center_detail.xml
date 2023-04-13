@@ -1,14 +1,229 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context=".activities.SportCenterDetail">
-    <TextView
-        android:id="@+id/textView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="page detail coming soon"></TextView>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:id="@+id/header_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+            <ImageView
+                android:id="@+id/center_image"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:src="@drawable/profile_picture"></ImageView>
+
+            <TextView
+                android:id="@+id/center_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:text="nom du centre"
+                android:textColor="@color/black"
+                android:textSize="24sp"
+                android:textStyle="bold"></TextView>
+
+            <!-- Informations du centre -->
+            <LinearLayout
+            android:id="@+id/info_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+                <TextView
+                    android:id="@+id/info_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Informations du centre"
+                    android:textSize="20sp"
+                    android:textStyle="bold"/>
+
+                <TextView
+                    android:id="@+id/info_address"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Adresse"
+                    android:textSize="16sp"/>
+
+                <TextView
+                    android:id="@+id/info_phone"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Numéro de téléphone"
+                    android:textSize="16sp"/>
+
+                <TextView
+                    android:id="@+id/info_hours"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Heures d'ouverture"
+                    android:textSize="16sp"/>
+            </LinearLayout>
+
+            <!-- Terrains de football -->
+            <LinearLayout
+                android:id="@+id/fields_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+                <TextView
+                    android:id="@+id/fields_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Terrains de football"
+                    android:textSize="20sp"
+                    android:textStyle="bold"/>
+
+                <LinearLayout
+                    android:id="@+id/field1_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:paddingTop="16dp">
+
+                    <ImageView
+                        android:id="@+id/field1_image"
+                        android:layout_width="150dp"
+                        android:layout_height="150dp"
+                        android:src="@drawable/profile_picturee"
+                        android:scaleType="centerCrop"/>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="8dp">
+
+                        <TextView
+                            android:id="@+id/field1_name"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Nom du terrain 1"
+                            android:textSize="18sp"
+                            android:textStyle="bold"/>
+                        <TextView
+                            android:id="@+id/field1_size"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Taille du terrain 1"
+                            android:textSize="16sp"
+                            android:paddingTop="8dp"/>
+                    </LinearLayout>
+                </LinearLayout>
+            </LinearLayout>
+            <!-- Calendrier de réservation -->
+            <LinearLayout
+                android:id="@+id/calendar_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:id="@+id/calendar_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Calendrier de réservation"
+                    android:textSize="20sp"
+                    android:textStyle="bold"/>
+
+                <!-- Calendrier pour le terrain -->
+                <LinearLayout
+                    android:id="@+id/calendar1_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingTop="16dp">
+
+                    <TextView
+                        android:id="@+id/calendar1_field_name"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Nom du terrain 1"
+                        android:textSize="18sp"
+                        android:textStyle="bold"/>
+
+                    <CalendarView
+                        android:id="@+id/calendar1_view"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
+
+                    <!--
+                    <TimePicker
+                        android:id="@+id/calendar1_time"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:timePickerMode="spinner"/> -->
+
+                    <GridLayout
+                        android:id="@+id/gridLayout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="#A0C18A"
+                        android:columnCount="3"
+                        android:rowCount="6">
+
+                    </GridLayout>
+
+                </LinearLayout>
+            </LinearLayout>
+            <!-- Commentaires et évaluations -->
+            <LinearLayout
+                android:id="@+id/reviews_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:id="@+id/reviews_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Commentaires et évaluations"
+                    android:textSize="20sp"
+                    android:textStyle="bold"/>
+
+                <EditText
+                    android:id="@+id/reviews_edittext"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Laissez votre commentaire ici..."
+                    android:inputType="textMultiLine"/>
+
+                <Button
+                    android:id="@+id/reviews_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Post"/>
+
+            </LinearLayout>
+            <LinearLayout
+                android:id="@+id/comment_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:id="@+id/comments_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Commentaires et évaluations"
+                    android:textSize="20sp"
+                    android:textStyle="bold"/>
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>
