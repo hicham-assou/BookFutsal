@@ -22,14 +22,14 @@
                 android:id="@+id/center_image"
                 android:layout_width="match_parent"
                 android:layout_height="200dp"
-                android:src="@drawable/profile_picture"></ImageView>
+                android:src="@drawable/cityfive"></ImageView>
 
             <TextView
                 android:id="@+id/center_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
-                android:text="nom du centre"
+                android:text="center name"
                 android:textColor="@color/black"
                 android:textSize="24sp"
                 android:textStyle="bold"></TextView>
@@ -45,7 +45,7 @@
                     android:id="@+id/info_title"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Informations du centre"
+                    android:text="centre information "
                     android:textSize="20sp"
                     android:textStyle="bold"/>
 
@@ -135,7 +135,7 @@
                     android:id="@+id/calendar_title"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Calendrier de réservation"
+                    android:text="Reservation calendar"
                     android:textSize="20sp"
                     android:textStyle="bold"/>
 
@@ -176,6 +176,13 @@
                         android:rowCount="6">
 
                     </GridLayout>
+                    <TextView
+                        android:id="@+id/info_weather"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text=""
+                        android:textSize="20sp"
+                        android:textStyle="bold"/>
 
                 </LinearLayout>
             </LinearLayout>

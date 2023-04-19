@@ -12,10 +12,22 @@ import android.widget.GridLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.example.bookfutsal.R;
 import com.example.bookfutsal.databinding.ActivityMainBinding;
 import com.example.bookfutsal.databinding.ActivitySportCenterDetailBinding;
 import com.example.bookfutsal.models.SportCenter;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class SportCenterDetail extends DrawerBaseActivity {
     ActivitySportCenterDetailBinding binding;
@@ -30,6 +42,14 @@ public class SportCenterDetail extends DrawerBaseActivity {
         SportCenter center = (SportCenter) getIntent().getSerializableExtra("center");
 
         allocateActivityTitle(center.getNameCenter());//donner le nom du centre en titre de l'activity
+
+        // info dans la page detail
+        binding.centerName.setText(center.getNameCenter());
+        binding.infoAddress.setText(center.getAdress());
+        binding.infoPhone.setText(center.getPhoneNumber());
+        binding.infoHours.setText(showOpeningHours(center.getOpeningHours()));
+        getInfoWheather(center.getLatitude(), center.getLongitude());
+
 
         //ajouter les textView
         int hours = 7;
@@ -80,6 +100,48 @@ public class SportCenterDetail extends DrawerBaseActivity {
                 });
             }
         }
+    }
+
+    private void getInfoWheather(double latitude, double longitude) {
+        RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
+        String url = "https://api.openweathermap.org/data/2.5/weather?lat="+latitude+"&lon="+longitude+"&appid=9211be69198a3f97d01c865ada5360e4";
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                try {
+                    // on recupere un JSON contenant toutes les info de la meteo de la latitude et longitude donné
+                    JSONObject jsonObject = new JSONObject(response);
+                    JSONObject main = jsonObject.getJSONObject("main"); // main car les info de la temperature se trouve la
+                    int temperature = (int)(main.getDouble("temp")-273.15); // -273.15 pour la transformer en C°
+
+                    int humidity = (int)(main.getDouble("humidity"));
+
+                    String weatherValue = "température = " + temperature + "C°, Humidity = " + humidity + "%";
+                    System.out.println("meteo ==> " + weatherValue);
+                    binding.infoWeather.setText(weatherValue);
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                showToast("error wheather");
+            }
+        });
+        queue.add(stringRequest);
+    }
+
+    private String showOpeningHours(HashMap<String, String> openingHours) {
+        String messageToReturn = "";
+        for (Map.Entry<String, String> entry : openingHours.entrySet()) {
+            String key = entry.getKey();
+            String value = entry.getValue();
+            messageToReturn += key + " : " + value + "\n";
+            //System.out.println("Clé: " + key + ", Valeur: " + value);
+        }
+        return messageToReturn;
     }
 
     public void showToast(String message){

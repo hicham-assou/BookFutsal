@@ -61,5 +61,7 @@ dependencies {
     implementation"androidx.navigation:navigation-ui-ktx:2.5.3"
     // grid
     implementation 'androidx.gridlayout:gridlayout:1.0.0'
+    // meteo
+    implementation'com.android.volley:volley:1.2.1'
 
 }

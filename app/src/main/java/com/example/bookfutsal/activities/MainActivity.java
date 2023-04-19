@@ -27,6 +27,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.navigation.NavigationView;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class MainActivity extends DrawerBaseActivity implements OnMapReadyCallback {
@@ -45,9 +46,18 @@ public class MainActivity extends DrawerBaseActivity implements OnMapReadyCallba
         allocateActivityTitle("Book Futsal");
 
         // Créer les centres sportifs
-        mSportCenters.add(new SportCenter(1,"Centre sportif 1", 50.8466, 4.3528, "rue du loisir, 24"));
-        mSportCenters.add(new SportCenter(2, "Centre sportif 2", 50.8951, 4.3414, "rue du bonheur, 24"));
-        mSportCenters.add(new SportCenter(3, "Centre sportif 3", 50.8463, 4.3614, "rue du piers, 24"));
+        HashMap<String, String> openingHours = new HashMap<>();
+        openingHours.put("Monday", "9h00 - 18h00");
+        openingHours.put("Tuesday", "9h00 - 18h00");
+        openingHours.put("Wednesday", "9h00 - 18h00");
+        openingHours.put("Thursday", "9h00 - 18h00");
+        openingHours.put("Friday", "9h00 - 18h00");
+        openingHours.put("Saturday", "10h00 - 16h00");
+        openingHours.put("Sunday", "close");
+
+        mSportCenters.add(new SportCenter(1,"CITY FIVE", 50.8466, 4.3528, "rue du loisir, 24", "04 65 32 15 48", 10, openingHours));
+        mSportCenters.add(new SportCenter(2, "ARENA", 50.8951, 4.3414, "rue du bonheur, 24"));
+        mSportCenters.add(new SportCenter(3, "FIT FIVE", 50.8463, 4.3614, "rue du piers, 24"));
 
         System.out.println("centre ajouter a la liste");
 
