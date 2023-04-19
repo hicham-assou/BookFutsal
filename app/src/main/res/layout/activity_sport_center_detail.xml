@@ -180,7 +180,7 @@
                         android:id="@+id/info_weather"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text=""
+                        android:text="temperature"
                         android:textSize="20sp"
                         android:textStyle="bold"/>
 

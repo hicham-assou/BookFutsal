@@ -117,7 +117,6 @@ public class SportCenterDetail extends DrawerBaseActivity {
                     int humidity = (int)(main.getDouble("humidity"));
 
                     String weatherValue = "température = " + temperature + "C°, Humidity = " + humidity + "%";
-                    System.out.println("meteo ==> " + weatherValue);
                     binding.infoWeather.setText(weatherValue);
 
                 } catch (JSONException e) {
