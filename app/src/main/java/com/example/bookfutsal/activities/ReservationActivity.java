@@ -33,8 +33,6 @@ public class ReservationActivity extends DrawerBaseActivity {
         setContentView(binding.getRoot());
         allocateActivityTitle("Reservations");
 
-        //ajouter titre aux lignes
-
 
         //ajouter les textView
         int hours = 7;

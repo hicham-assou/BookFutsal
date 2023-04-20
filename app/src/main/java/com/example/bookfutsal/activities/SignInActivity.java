@@ -51,6 +51,8 @@ public class SignInActivity extends DrawerBaseActivity {
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if (task.isSuccessful()){
                     showToast("SignIn successfully !");
+                    // sa permet de cacher le bouton connexion
+                    connected();
                 }else{
                     showToast("SignIn Failed !");
                 }

@@ -18,10 +18,12 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 public class SignUpActivity extends DrawerBaseActivity {
     ActivitySignUpBinding binding;
     private FirebaseAuth mAuth;
+    private FirebaseFirestore dbFirestore;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,6 +33,7 @@ public class SignUpActivity extends DrawerBaseActivity {
         allocateActivityTitle("SIGN UP");
 
         mAuth = FirebaseAuth.getInstance();
+        dbFirestore = FirebaseFirestore.getInstance();
     }
 
     public void signupButtonClicked(View v){
@@ -58,33 +61,34 @@ public class SignUpActivity extends DrawerBaseActivity {
                 .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()){
-                            //enregister l'user a la realTime
+                        if (task.isSuccessful()) {
+                            //enregister l'user dans Firestore
                             User user = new User(username, password, email);
-                            FirebaseDatabase.getInstance().getReference("users")
-                                    .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
-                                    .setValue(user).addOnCompleteListener(new OnCompleteListener<Void>() {
+                            dbFirestore.collection("users")
+                                    .document(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                                    .set(user)
+                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
                                         @Override
                                         public void onComplete(@NonNull Task<Void> task) {
-                                            if (task.isSuccessful()){
+                                            if (task.isSuccessful()) {
                                                 showToast("successfully !");
                                                 binding.progressBar.setVisibility(View.GONE);
                                                 // rediriger vers la page de connexion
                                                 startActivity(new Intent(SignUpActivity.this, SignInActivity.class));
                                                 overridePendingTransition(0, 0);
-                                            }else{
+                                            } else {
                                                 showToast("Failed !");
                                                 binding.progressBar.setVisibility(View.GONE);
                                             }
                                         }
                                     });
-
-                        }else{
+                        } else {
                             showToast("Failed !");
                             binding.progressBar.setVisibility(View.GONE);
                         }
                     }
                 });
+
 
     }
 
