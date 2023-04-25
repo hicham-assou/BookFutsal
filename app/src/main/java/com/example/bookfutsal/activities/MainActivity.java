@@ -25,6 +25,8 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.navigation.NavigationView;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -47,19 +49,18 @@ public class MainActivity extends DrawerBaseActivity implements OnMapReadyCallba
 
         // Créer les centres sportifs
         HashMap<String, String> openingHours = new HashMap<>();
-        openingHours.put("Monday", "9h00 - 18h00");
-        openingHours.put("Tuesday", "9h00 - 18h00");
-        openingHours.put("Wednesday", "9h00 - 18h00");
-        openingHours.put("Thursday", "9h00 - 18h00");
-        openingHours.put("Friday", "9h00 - 18h00");
-        openingHours.put("Saturday", "10h00 - 16h00");
+        openingHours.put("Monday", "9:00 AM - 10:00 PM");
+        openingHours.put("Tuesday", "9:00 AM - 10:00 PM");
+        openingHours.put("Wednesday", "9:00 AM - 10:00 PM");
+        openingHours.put("Thursday", "9:00 AM - 10:00 PM");
+        openingHours.put("Friday", "9:00 AM - 10:00 PM");
+        openingHours.put("Saturday", "10:00 AM - 8:00 PM");
         openingHours.put("Sunday", "close");
 
-        mSportCenters.add(new SportCenter(1,"CITY FIVE", 50.8466, 4.3528, "rue du loisir, 24", "04 65 32 15 48", 10, openingHours));
-        mSportCenters.add(new SportCenter(2, "ARENA", 50.8951, 4.3414, "rue du bonheur, 24"));
-        mSportCenters.add(new SportCenter(3, "FIT FIVE", 50.8463, 4.3614, "rue du piers, 24"));
+        mSportCenters.add(new SportCenter(1,"CITY FIVE", 50.8466, 4.3528, "rue du loisir, 24", "04 65 32 15 48", 10, openingHours, ""));
+        mSportCenters.add(new SportCenter(2, "ARENA", 50.8951, 4.3414, "rue du bonheur, 24", "04 65 32 15 48", 10, openingHours, ""));
+        mSportCenters.add(new SportCenter(3, "FIT FIVE", 50.8463, 4.3614, "rue du piers, 24", "04 65 32 15 48", 10, openingHours, ""));
 
-        System.out.println("centre ajouter a la liste");
 
         // Obtenir la carte depuis la vue XML
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()

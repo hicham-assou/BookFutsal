@@ -5,11 +5,11 @@ import java.util.HashMap;
 
 public class SportCenter implements Serializable {
     private int id, priceHour;
-    private String nameCenter, adress, image, phoneNumber;
+    private String nameCenter, adress, image, phoneNumber, comments;
     private double latitude, longitude;
     private HashMap<String, String> openingHours;
 
-    public SportCenter(int id, String nameCenter, double latitude, double longitude, String adress, String phoneNumber, int priceHour, HashMap<String, String> openingHours){
+    public SportCenter(int id, String nameCenter, double latitude, double longitude, String adress, String phoneNumber, int priceHour, HashMap<String, String> openingHours, String comments){
         this.id = id;
         this.nameCenter = nameCenter;
         this.latitude = latitude;
@@ -18,6 +18,7 @@ public class SportCenter implements Serializable {
         this.phoneNumber = phoneNumber;
         this.priceHour = priceHour;
         this.openingHours = openingHours;
+        this.comments = comments;
     }
 
     public SportCenter(int id, String nameCenter, double latitude, double longitude, String adress){
