@@ -4,6 +4,9 @@ public class Reservation {
     private String hour, sportCenterName, date;
     private User booker;
 
+    public Reservation() {
+    }
+
     public Reservation(String hour, String sportCenterName, User booker, String date) {
         this.hour = hour;
         this.sportCenterName = sportCenterName;

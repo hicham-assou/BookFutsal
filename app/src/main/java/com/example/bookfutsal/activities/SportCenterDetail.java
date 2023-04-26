@@ -83,7 +83,7 @@ public class SportCenterDetail extends DrawerBaseActivity {
         binding.infoAddress.setText(center.getAdress());
         binding.infoPhone.setText(center.getPhoneNumber());
         binding.infoHours.setText(showOpeningHours(center.getOpeningHours()));
-        getInfoWheather(center.getLatitude(), center.getLongitude());
+        //getInfoWheather(center.getLatitude(), center.getLongitude());
 
 
         //calendrier
@@ -279,7 +279,7 @@ public class SportCenterDetail extends DrawerBaseActivity {
 
 
     // api meteo
-    private void getInfoWheather(double latitude, double longitude) {
+    /*private void getInfoWheather(double latitude, double longitude) {
         RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
         String url = "https://api.openweathermap.org/data/2.5/weather?lat="+latitude+"&lon="+longitude+"&appid=9211be69198a3f97d01c865ada5360e4";
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
@@ -307,7 +307,7 @@ public class SportCenterDetail extends DrawerBaseActivity {
             }
         });
         queue.add(stringRequest);
-    }
+    }*/
 
     private String showOpeningHours(HashMap<String, String> openingHours) {
         String messageToReturn = "";

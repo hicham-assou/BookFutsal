@@ -19,13 +19,27 @@ import android.widget.Toast;
 import com.example.bookfutsal.R;
 import com.example.bookfutsal.databinding.ActivityMainBinding;
 import com.example.bookfutsal.databinding.ActivityReservationBinding;
+import com.example.bookfutsal.interfaces.ReservationsCallback;
+import com.example.bookfutsal.models.Reservation;
+import com.example.bookfutsal.models.User;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class ReservationActivity extends DrawerBaseActivity {
 
-    private static final int ROW_COUNT = 24;
-    private static final int COLUMN_COUNT = 3;
-
     private ActivityReservationBinding binding;
+    FirebaseAuth mAuth;
+    FirebaseUser currentUser;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -33,50 +47,41 @@ public class ReservationActivity extends DrawerBaseActivity {
         setContentView(binding.getRoot());
         allocateActivityTitle("Reservations");
 
+        // récupérer l'utilisateur connecté
+        mAuth = FirebaseAuth.getInstance();
+        currentUser = mAuth.getCurrentUser();
 
-        //ajouter les textView
-        int hours = 7;
-        for(int i=0; i<binding.gridLayout.getRowCount(); i++){
-            for(int j=0; j<binding.gridLayout.getColumnCount(); j++){
-                hours ++;
-                TextView textView = new TextView(this);
-                textView.setBackgroundColor(Color.GREEN);
-                GridLayout.LayoutParams params = new GridLayout.LayoutParams();
-                params.columnSpec = GridLayout.spec(j, 1f);
-                params.rowSpec = GridLayout.spec(i, 1f);
-                params.setMargins(8, 8, 8, 8); // Ajouter des marges
-                textView.setLayoutParams(params);
-                textView.setText(hours+"h - "+ (hours+1) + "h");
-                textView.setId(hours);
-                textView.setGravity(Gravity.CENTER); // Centrer le texte dans le TextView
-                binding.gridLayout.addView(textView);
-                int id = hours;
-                textView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        showToast("textView "+ id);
-                        AlertDialog.Builder builder = new AlertDialog.Builder(ReservationActivity.this);
-                        builder.setMessage("book on 12/10 from " + id + " to "+ (id + 1) +" ?")
-                                .setTitle("Reservation")
-                                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int id) {
-                                        textView.setBackgroundColor(Color.RED);
-                                    }
-                                })
-                                .setNegativeButton("cancel", new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int id) {
-                                        // Action à exécuter lorsque l'utilisateur appuie sur "Annuler"
-                                    }
-                                });
-                        AlertDialog dialog = builder.create();
-                        dialog.show();
-                    }
-                });
+        getReservationsOfUser(new ReservationsCallback() {
+            @Override
+            public void onReservationsReceived(List<Reservation> reservations) {
+                for (Reservation reservation : reservations) {
+                    // a poursuivre
+                }
             }
-        }
+        });
+    }
 
+    private void getReservationsOfUser(ReservationsCallback callback) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        CollectionReference reservationsRef = db.collection("reservations");
 
+        List<Reservation> list = new ArrayList<>();
 
+        reservationsRef.get().addOnSuccessListener(queryDocumentSnapshots -> {
+            for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                String sportCenterName = documentSnapshot.getString("sportCenterName");
+                String date = documentSnapshot.getString("date");
+                String hour = documentSnapshot.getString("hour");
+                User booker = documentSnapshot.toObject(Reservation.class).getBooker();
+                if (booker.getEmail().equals(currentUser.getEmail())) {
+                    list.add(new Reservation(hour, sportCenterName, date));
+                }
+            }
+            System.out.println("list => " + list);
+            callback.onReservationsReceived(list);
+        }).addOnFailureListener(e -> {
+            // Gérer l'erreur ici, si nécessaire
+        });
     }
 
     public void showToast(String message){
