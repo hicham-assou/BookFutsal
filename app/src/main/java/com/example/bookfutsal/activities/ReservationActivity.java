@@ -1,6 +1,8 @@
 package com.example.bookfutsal.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -17,6 +19,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.bookfutsal.R;
+import com.example.bookfutsal.adapter.ReservationAdapter;
 import com.example.bookfutsal.databinding.ActivityMainBinding;
 import com.example.bookfutsal.databinding.ActivityReservationBinding;
 import com.example.bookfutsal.interfaces.ReservationsCallback;
@@ -39,6 +42,8 @@ public class ReservationActivity extends DrawerBaseActivity {
     private ActivityReservationBinding binding;
     FirebaseAuth mAuth;
     FirebaseUser currentUser;
+    RecyclerView rvReservations;
+    ReservationAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,12 +56,22 @@ public class ReservationActivity extends DrawerBaseActivity {
         mAuth = FirebaseAuth.getInstance();
         currentUser = mAuth.getCurrentUser();
 
+        // configurer la RecyclerView et l'adapter
+        rvReservations = findViewById(R.id.reservations_recycler_view);
+        rvReservations.setLayoutManager(new LinearLayoutManager(this));
+        adapter = new ReservationAdapter(new ArrayList<>());
+        rvReservations.setAdapter(adapter);
+
         getReservationsOfUser(new ReservationsCallback() {
             @Override
             public void onReservationsReceived(List<Reservation> reservations) {
-                for (Reservation reservation : reservations) {
-                    // a poursuivre
+                if (reservations.size() == 0)
+                    showToast("No Reservations");
+                else{
+                    // ajouter les réservations à la liste de l'adapter
+                    adapter.setReservations(reservations);
                 }
+
             }
         });
     }
@@ -80,7 +95,7 @@ public class ReservationActivity extends DrawerBaseActivity {
             System.out.println("list => " + list);
             callback.onReservationsReceived(list);
         }).addOnFailureListener(e -> {
-            // Gérer l'erreur ici, si nécessaire
+            showToast("Une erreur est survenue lors de la récupération des réservations.");
         });
     }
 
