@@ -71,6 +71,10 @@ public class ReservationActivity extends DrawerBaseActivity {
                     // ajouter les réservations à la liste de l'adapter
                     adapter.setReservations(reservations);
                 }
+                for (Reservation r: reservations){
+                    System.out.println("date => " + r.getDate());
+                    System.out.println("prix => " + r.getPrice());
+                }
 
             }
         });
@@ -87,12 +91,17 @@ public class ReservationActivity extends DrawerBaseActivity {
                 String sportCenterName = documentSnapshot.getString("sportCenterName");
                 String date = documentSnapshot.getString("date");
                 String hour = documentSnapshot.getString("hour");
+                String image = documentSnapshot.getString("imageCenter");
+
+                long priceHourLong = documentSnapshot.getLong("price");
+                int price = (int) priceHourLong;
+
+
                 User booker = documentSnapshot.toObject(Reservation.class).getBooker();
                 if (booker.getEmail().equals(currentUser.getEmail())) {
-                    list.add(new Reservation(hour, sportCenterName, date));
+                    list.add(new Reservation(hour, sportCenterName, date, image, price));
                 }
             }
-            System.out.println("list => " + list);
             callback.onReservationsReceived(list);
         }).addOnFailureListener(e -> {
             showToast("Une erreur est survenue lors de la récupération des réservations.");

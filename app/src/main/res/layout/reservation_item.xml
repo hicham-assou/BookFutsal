@@ -5,16 +5,27 @@
     android:id="@+id/card_view"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="#FFADAD"
+    android:background="#FDF6E3"
     android:layout_margin="8dp"
     app:cardCornerRadius="8dp"
     app:cardElevation="2dp"
+    app:cardBackgroundColor="#74F8EC"
     app:cardUseCompatPadding="true">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#CDFFB2"
+        android:orientation="vertical">
+
+        <ImageView
+            android:id="@+id/item_center_image"
+            android:layout_width="match_parent"
+            android:layout_height="160dp"
+            android:scaleType="centerCrop" />
+
+        <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:orientation="vertical"
         android:padding="16dp">
 
@@ -27,21 +38,80 @@
             android:textSize="16sp"
             android:textStyle="bold"/>
 
-        <TextView
-            android:id="@+id/item_date"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Date de réservation"
-            android:textColor="@color/black"
-            android:textSize="14sp"/>
+            android:orientation="horizontal"
+            android:layout_marginTop="8dp">
 
-        <TextView
-            android:id="@+id/item_timeReservation"
-            android:layout_width="wrap_content"
+            <TextView
+                android:id="@+id/item_date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Reservation date : "
+                android:textColor="@color/black"
+                android:textSize="14sp"/>
+
+            <TextView
+                android:id="@+id/item_date_value"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="01/05/2023"
+                android:textColor="@color/black"
+                android:textSize="14sp"
+                android:textStyle="bold"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Heure de réservation"
-            android:textColor="@color/black"
-            android:textSize="14sp"/>
+            android:orientation="horizontal"
+            android:layout_marginTop="4dp">
+
+            <TextView
+                android:id="@+id/item_timeReservation"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Reservation time : "
+                android:textColor="@color/black"
+                android:textSize="14sp"/>
+
+            <TextView
+                android:id="@+id/item_timeReservation_value"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="10:00 - 11:00"
+                android:textColor="@color/black"
+                android:textSize="14sp"
+                android:textStyle="bold"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="4dp">
+
+            <TextView
+                android:id="@+id/item_price"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Price : "
+                android:textColor="@color/black"
+                android:textSize="14sp"/>
+
+            <TextView
+                android:id="@+id/item_price_value"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="50 €"
+                android:textColor="@color/black"
+                android:textSize="14sp"
+                android:textStyle="bold"/>
+
+        </LinearLayout>
 
         <Button
             android:id="@+id/button_cancelReservation"
@@ -50,7 +120,8 @@
             android:layout_gravity="end"
             android:backgroundTint="#AC5D5D"
             android:text="cancel the reservation"
-            android:textColor="@color/white"/>
-
+            android:textColor="@color/white" />
     </LinearLayout>
+    </LinearLayout>
+
 </androidx.cardview.widget.CardView>

@@ -22,7 +22,7 @@
                 android:id="@+id/center_image"
                 android:layout_width="match_parent"
                 android:layout_height="200dp"
-                android:src=""></ImageView>
+                android:src="@drawable/img"></ImageView>
 
             <TextView
                 android:id="@+id/center_name"
@@ -72,7 +72,7 @@
             </LinearLayout>
 
             <!-- Terrains de football -->
-            <LinearLayout
+            <!--<LinearLayout
                 android:id="@+id/fields_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -122,7 +122,7 @@
                             android:paddingTop="8dp"/>
                     </LinearLayout>
                 </LinearLayout>
-            </LinearLayout>
+            </LinearLayout>-->
             <!-- Calendrier de réservation -->
             <LinearLayout
                 android:id="@+id/calendar_layout"
@@ -147,13 +147,13 @@
                     android:orientation="vertical"
                     android:paddingTop="16dp">
 
-                    <TextView
+                    <!--<TextView
                         android:id="@+id/calendar1_field_name"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="Nom du terrain 1"
                         android:textSize="18sp"
-                        android:textStyle="bold"/>
+                        android:textStyle="bold"/>-->
 
                     <CalendarView
                         android:id="@+id/calendar1_view"

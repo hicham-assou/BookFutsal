@@ -5,6 +5,10 @@ import androidx.appcompat.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.bookfutsal.R;
@@ -22,6 +26,9 @@ import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.GeoPoint;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.squareup.picasso.Picasso;
+
+import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -33,6 +40,7 @@ public class MainActivity extends DrawerBaseActivity implements OnMapReadyCallba
     private ActivityMainBinding binding;
     private GoogleMap map;
 
+
     private AlertDialog.Builder markerDialogBuilder;
 
 
@@ -42,6 +50,8 @@ public class MainActivity extends DrawerBaseActivity implements OnMapReadyCallba
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         allocateActivityTitle("Book Futsal");
+
+
 
         // Obtenir la carte depuis la vue XML
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -113,8 +123,25 @@ public class MainActivity extends DrawerBaseActivity implements OnMapReadyCallba
                         public boolean onMarkerClick(Marker marker) {
                             SportCenter center = (SportCenter) marker.getTag(); // Récupérer le centre sportif à partir du tag du marqueur
                             if (center != null) {
-                                markerDialogBuilder.setTitle(center.getNameCenter())
-                                        .setMessage(center.getAdress())
+
+                               // popup personnaliser
+                                View popupView = getLayoutInflater().inflate(R.layout.popup_layout, null);
+
+                                TextView nameTextView = popupView.findViewById(R.id.popup_centerNameTextView);
+                                TextView addressTextView = popupView.findViewById(R.id.popup_centerAddressTextView);
+                                TextView priceTextView = popupView.findViewById(R.id.popup_price);
+                                ImageView centerImageView = popupView.findViewById(R.id.popup_centerImage);
+
+                                // Charger l'image à partir de l'URL avec Picasso
+                                Picasso.get().load(center.getImage()).into(centerImageView);
+
+                                // Définir les txtView
+                                nameTextView.setText(center.getNameCenter());
+                                addressTextView.setText(center.getAdress());
+                                priceTextView.setText(center.getPriceHour() + " €/H");
+
+                                // Afficher popup
+                                markerDialogBuilder.setView(popupView)
                                         .setPositiveButton("ok", new DialogInterface.OnClickListener() {
                                             @Override
                                             public void onClick(DialogInterface dialog, int which) {
@@ -130,6 +157,23 @@ public class MainActivity extends DrawerBaseActivity implements OnMapReadyCallba
                                             }
                                         })
                                         .show();
+                                /*markerDialogBuilder.setTitle(center.getNameCenter())
+                                        .setMessage(center.getAdress())
+                                        .setPositiveButton("ok", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                dialog.dismiss();
+                                            }
+                                        })
+                                        .setNegativeButton("more details", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                Intent intent = new Intent(MainActivity.this, SportCenterDetail.class);
+                                                intent.putExtra("center", center);
+                                                startActivity(intent);
+                                            }
+                                        })
+                                        .show();*/
                             }
                             return true;
                         }

@@ -202,7 +202,7 @@ public class SportCenterDetail extends DrawerBaseActivity {
                                                 getCurrentUser(new OnUserFetchListener() {
                                                     @Override
                                                     public void onUserFetch(User user) {
-                                                        Reservation reservation = new Reservation(hour, center.getNameCenter(), user, date);
+                                                        Reservation reservation = new Reservation(hour, center.getNameCenter(), user, date, center.getImage(), center.getPriceHour());
                                                         // Ajouter la réservation à Firestore
                                                         addToFirestore(reservation);
                                                     }

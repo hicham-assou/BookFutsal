@@ -1,17 +1,24 @@
 package com.example.bookfutsal.models;
 
 public class Reservation {
-    private String hour, sportCenterName, date;
+    private String hour, sportCenterName, date, imageCenter;
     private User booker;
+    private int price;
 
     public Reservation() {
     }
 
-    public Reservation(String hour, String sportCenterName, User booker, String date) {
+    public int getPrice() {
+        return price;
+    }
+
+    public Reservation(String hour, String sportCenterName, User booker, String date, String imageCenter, int price) {
         this.hour = hour;
         this.sportCenterName = sportCenterName;
         this.booker = booker;
         this.date = date;
+        this.imageCenter = imageCenter;
+        this.price = price;
     }
 
     public Reservation(String hour, String sportCenterName, String date) {
@@ -20,27 +27,25 @@ public class Reservation {
         this.date = date;
     }
 
-    public void setDate(String date) {
+    public Reservation(String hour, String sportCenterName, String date, String imageCenter, int price) {
+        this.hour = hour;
+        this.sportCenterName = sportCenterName;
         this.date = date;
+        this.imageCenter = imageCenter;
+        this.price = price;
     }
+
 
     public String getDate() {
         return date;
     }
 
-    public void setHour(String hour) {
-        this.hour = hour;
+
+    public String getImageCenter() {
+        return imageCenter;
     }
 
 
-
-    public void setSportCenterName(String sportCenterName) {
-        this.sportCenterName = sportCenterName;
-    }
-
-    public void setBooker(User booker) {
-        this.booker = booker;
-    }
 
     public String getSportCenterName() {
         return sportCenterName;
