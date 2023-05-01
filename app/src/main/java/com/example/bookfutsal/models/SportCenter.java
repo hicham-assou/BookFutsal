@@ -2,6 +2,7 @@ package com.example.bookfutsal.models;
 
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.Map;
 
 public class SportCenter implements Serializable {
     private int id, priceHour;
@@ -9,7 +10,7 @@ public class SportCenter implements Serializable {
     private double latitude, longitude;
     private HashMap<String, String> openingHours;
 
-    public SportCenter(int id, String nameCenter, double latitude, double longitude, String adress, String phoneNumber, int priceHour, HashMap<String, String> openingHours, String comments){
+    /*public SportCenter(int id, String nameCenter, double latitude, double longitude, String adress, String phoneNumber, int priceHour, Map<String, Object> openingHours, String comments){
         this.id = id;
         this.nameCenter = nameCenter;
         this.latitude = latitude;
@@ -27,6 +28,22 @@ public class SportCenter implements Serializable {
         this.latitude = latitude;
         this.longitude = longitude;
         this.adress = adress;
+    }*/
+
+    public SportCenter(int priceHour, String nameCenter, String adress, String image, String phoneNumber, String comments, double latitude, double longitude, HashMap<String, String> openingHours) {
+        this.priceHour = priceHour;
+        this.nameCenter = nameCenter;
+        this.adress = adress;
+        this.image = image;
+        this.phoneNumber = phoneNumber;
+        this.comments = comments;
+        this.latitude = latitude;
+        this.longitude = longitude;
+        this.openingHours = openingHours;
+    }
+
+    public String getComments() {
+        return comments;
     }
 
     public int getPriceHour() {

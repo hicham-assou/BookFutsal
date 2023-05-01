@@ -8,6 +8,8 @@ import androidx.core.content.ContextCompat;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -44,6 +46,8 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -74,6 +78,22 @@ public class SportCenterDetail extends DrawerBaseActivity {
 
         //recup du centre appuyé
         SportCenter center = (SportCenter) getIntent().getSerializableExtra("center");
+
+        //image du centre
+        FirebaseStorage storage = FirebaseStorage.getInstance();
+        StorageReference storageRef = storage.getReferenceFromUrl(center.getImage());
+        storageRef.getBytes(Long.MAX_VALUE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
+            @Override
+            public void onSuccess(byte[] bytes) {
+                Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                binding.centerImage.setImageBitmap(bitmap);
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+                showToast("Error while loading the image");
+            }
+        });
 
         //donner le nom du centre en titre de l'activity
         allocateActivityTitle(center.getNameCenter());
@@ -119,7 +139,7 @@ public class SportCenterDetail extends DrawerBaseActivity {
     private void reservation_grid(SportCenter center, String date) {
 
         int hours = 7;
-        String suffix ="AM";
+        final String suffix ="H";
         for(int i=0; i<binding.gridLayout.getRowCount(); i++){
             for(int j=0; j<binding.gridLayout.getColumnCount(); j++){
                 hours ++;
@@ -130,16 +150,16 @@ public class SportCenterDetail extends DrawerBaseActivity {
                 params.rowSpec = GridLayout.spec(i, 1f);
                 params.setMargins(8, 8, 8, 8); // Ajouter des marges
                 textView.setLayoutParams(params);
-                if (hours >= 13) {
-                    hours -= 12;
-                } else if (hours == 0) {
-                    hours = 12;
-                    suffix = "PM";
-                }
-                if(hours == 12)
-                    textView.setText(hours + suffix + " - 1" + suffix);
+
+                if (hours == 24)
+                    hours = 0;
+
+                if (hours == 23)
+                    textView.setText(hours + suffix + " - 0" + suffix);
                 else
-                    textView.setText(hours + suffix + " - "+ (hours+1) + suffix);
+                    textView.setText(hours + suffix + " - " + (hours+1) + suffix);
+
+
 
 
                 textView.setId(hours);
@@ -170,7 +190,7 @@ public class SportCenterDetail extends DrawerBaseActivity {
                         }
                         else {
                             AlertDialog.Builder builder = new AlertDialog.Builder(SportCenterDetail.this);
-                            builder.setMessage("book on 12/10 at " + textView.getText() +" ?")
+                            builder.setMessage("book on " + date+ " at " + textView.getText() +" ?")
                                     .setTitle("Reservation")
                                     .setPositiveButton("Reserve Now !", new DialogInterface.OnClickListener() {
                                         // lorsqu'il veut reserver

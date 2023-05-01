@@ -53,6 +53,7 @@ public class SignInActivity extends DrawerBaseActivity {
                     showToast("SignIn successfully !");
                     // sa permet de cacher le bouton connexion
                     connected();
+                    startActivity(new Intent(SignInActivity.this, MainActivity.class));
                 }else{
                     showToast("SignIn Failed !");
                 }

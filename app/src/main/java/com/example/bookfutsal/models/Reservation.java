@@ -54,4 +54,5 @@ public class Reservation {
     public User getBooker() {
         return booker;
     }
+
 }
