@@ -92,14 +92,14 @@ public class ReservationActivity extends DrawerBaseActivity {
                 String date = documentSnapshot.getString("date");
                 String hour = documentSnapshot.getString("hour");
                 String image = documentSnapshot.getString("imageCenter");
-
+                String id = documentSnapshot.getId();
                 long priceHourLong = documentSnapshot.getLong("price");
                 int price = (int) priceHourLong;
 
 
                 User booker = documentSnapshot.toObject(Reservation.class).getBooker();
                 if (booker.getEmail().equals(currentUser.getEmail())) {
-                    list.add(new Reservation(hour, sportCenterName, date, image, price));
+                    list.add(new Reservation(id, hour, sportCenterName, date, image, price));
                 }
             }
             callback.onReservationsReceived(list);

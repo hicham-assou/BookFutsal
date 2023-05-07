@@ -202,7 +202,8 @@ public class SportCenterDetail extends DrawerBaseActivity {
                                                 getCurrentUser(new OnUserFetchListener() {
                                                     @Override
                                                     public void onUserFetch(User user) {
-                                                        Reservation reservation = new Reservation(hour, center.getNameCenter(), user, date, center.getImage(), center.getPriceHour());
+
+                                                        Reservation reservation = new Reservation( hour, center.getNameCenter(), user, date, center.getImage(), center.getPriceHour());
                                                         // Ajouter la réservation à Firestore
                                                         addToFirestore(reservation);
                                                     }
@@ -262,17 +263,14 @@ public class SportCenterDetail extends DrawerBaseActivity {
                 .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                     @Override
                     public void onSuccess(DocumentReference documentReference) {
-                        Log.d(TAG, "Réservation ajoutée avec ID : " + documentReference.getId());
-                        // La réservation a été ajoutée avec succès à Firestore
-                        // Faites ce que vous avez besoin de faire après l'ajout
+                        showToast("reservation successfully completed ");
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        Log.w(TAG, "Erreur lors de l'ajout de la réservation", e);
-                        // La réservation n'a pas été ajoutée à Firestore
-                        // Gérez l'erreur ici
+                        showToast("Error reservation ");
+
                     }
                 });
     }
