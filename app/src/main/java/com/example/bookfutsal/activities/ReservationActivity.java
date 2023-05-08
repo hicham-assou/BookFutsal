@@ -108,6 +108,10 @@ public class ReservationActivity extends DrawerBaseActivity {
         });
     }
 
+    public static void cancelReservation(){
+
+    }
+
     public void showToast(String message){
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }

@@ -198,21 +198,22 @@
                     android:id="@+id/reviews_title"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Commentaires et évaluations"
+                    android:text="comments"
                     android:textSize="20sp"
                     android:textStyle="bold"/>
 
                 <EditText
-                    android:id="@+id/reviews_edittext"
+                    android:id="@+id/comment_edittext"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Laissez votre commentaire ici..."
+                    android:hint="Leave your comment here..."
                     android:inputType="textMultiLine"/>
 
                 <Button
                     android:id="@+id/reviews_button"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:onClick="postComment"
                     android:text="Post"/>
 
             </LinearLayout>
@@ -224,12 +225,39 @@
                 android:padding="16dp">
 
                 <TextView
-                    android:id="@+id/comments_title"
+                    android:visibility="gone"
+                    android:id="@+id/comments_1"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Commentaires et évaluations"
+                    android:text=""
                     android:textSize="20sp"
                     android:textStyle="bold"/>
+                <TextView
+                    android:visibility="gone"
+                    android:id="@+id/comments_2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text=""
+                    android:textSize="20sp"
+                    android:textStyle="bold"/>
+                <TextView
+                    android:visibility="gone"
+                    android:id="@+id/comments_3"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text=""
+                    android:textSize="20sp"
+                    android:textStyle="bold"/>
+                <TextView
+                    android:id="@+id/textView_more_comments"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="More comments"
+                    android:layout_gravity="center"
+                    android:visibility="gone"
+                    android:onClick="loadAllComments"
+                    />
+
             </LinearLayout>
         </LinearLayout>
     </ScrollView>

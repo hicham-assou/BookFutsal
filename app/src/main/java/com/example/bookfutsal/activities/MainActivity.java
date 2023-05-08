@@ -1,10 +1,13 @@
 package com.example.bookfutsal.activities;
 
+import static android.content.ContentValues.TAG;
+
 import androidx.appcompat.app.AlertDialog;
 
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
@@ -23,6 +26,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.FieldPath;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.GeoPoint;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -31,6 +35,7 @@ import com.squareup.picasso.Picasso;
 import org.w3c.dom.Text;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -71,16 +76,17 @@ public class MainActivity extends DrawerBaseActivity implements OnMapReadyCallba
             for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
                 String nameCenter = documentSnapshot.getString("nameCenter");
                 String adress = documentSnapshot.getString("adress");
-                String comments = documentSnapshot.getString("comments");
                 String image = documentSnapshot.getString("image");
                 String phoneNumber = documentSnapshot.getString("phoneNumber");
                 long priceHourLong = documentSnapshot.getLong("priceHour");
                 int priceHour = (int) priceHourLong;
 
+                // commentaires
+                List<String> comments = (List<String>) documentSnapshot.get("comments");
+
                 Map<String, Object> openingHoursMap = documentSnapshot.getData();
                 // transformer en hashmap
                 HashMap<String, String> openingHours = (HashMap<String, String>) openingHoursMap.get("openingHours");
-
 
 
                 GeoPoint location = documentSnapshot.getGeoPoint("location");
@@ -95,8 +101,6 @@ public class MainActivity extends DrawerBaseActivity implements OnMapReadyCallba
             showToast("Une erreur est survenue lors de la récupération des réservations.");
         });
     }
-
-
 
     @Override
     public void onMapReady(GoogleMap googleMap) {

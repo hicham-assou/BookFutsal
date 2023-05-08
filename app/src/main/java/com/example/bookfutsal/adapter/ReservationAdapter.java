@@ -14,6 +14,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.bookfutsal.R;
+import com.example.bookfutsal.activities.ReservationActivity;
 import com.example.bookfutsal.models.Reservation;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.DocumentReference;
@@ -52,6 +53,7 @@ public class ReservationAdapter extends RecyclerView.Adapter<ReservationAdapter.
         holder.cancelReservationButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //ReservationActivity.cancelReservation(currentReservation);
 
                 String reservationId = currentReservation.getId();
 

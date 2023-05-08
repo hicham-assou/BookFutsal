@@ -5,6 +5,8 @@ import static android.content.ContentValues.TAG;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -29,6 +31,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.bookfutsal.R;
+import com.example.bookfutsal.adapter.CommentsAdapter;
 import com.example.bookfutsal.databinding.ActivityMainBinding;
 import com.example.bookfutsal.databinding.ActivitySportCenterDetailBinding;
 import com.example.bookfutsal.interfaces.OnUserFetchListener;
@@ -43,6 +46,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -58,6 +62,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 public class SportCenterDetail extends DrawerBaseActivity {
@@ -65,6 +70,8 @@ public class SportCenterDetail extends DrawerBaseActivity {
     FirebaseAuth mAuth;
     FirebaseUser currentUser;
     CalendarView calendar;
+    SportCenter center;
+    private AlertDialog.Builder markerDialogBuilder;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,12 +79,14 @@ public class SportCenterDetail extends DrawerBaseActivity {
         binding = ActivitySportCenterDetailBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
+        markerDialogBuilder = new AlertDialog.Builder(this);
+
         //recuperer l'utilisateur connecté
         mAuth = FirebaseAuth.getInstance();
         currentUser = mAuth.getCurrentUser();
 
         //recup du centre appuyé
-        SportCenter center = (SportCenter) getIntent().getSerializableExtra("center");
+        center = (SportCenter) getIntent().getSerializableExtra("center");
 
         //image du centre
         FirebaseStorage storage = FirebaseStorage.getInstance();
@@ -111,7 +120,7 @@ public class SportCenterDetail extends DrawerBaseActivity {
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
         String formattedDate = sdf.format(new Date()); // 05/04/2023
         //afficher celui d'aujourd'hui par defaut
-        reservation_grid(center, formattedDate);
+        reservation_grid(formattedDate);
 
         calendar = binding.calendar1View;
         calendar.setMinDate(System.currentTimeMillis()); // Empecher la sélection de jours antérieurs à la date actuelle
@@ -129,14 +138,69 @@ public class SportCenterDetail extends DrawerBaseActivity {
                 SimpleDateFormat sdf2 = new SimpleDateFormat("dd/MM/yyyy");
                 String formattedDate = sdf2.format(date); // 05/04/2023
 
-                reservation_grid(center, formattedDate);
+                reservation_grid(formattedDate);
 
             }
         });
 
+        //commentaire
+        loadComment();
+
     }
 
-    private void reservation_grid(SportCenter center, String date) {
+    // avvir les 3 premiers commentaires
+    private void loadComment() {
+        List<String> comments = center.getComments();
+
+        if (comments.size() >= 1) {
+            showComment(binding.comments1, comments.get(0));
+        }
+
+        if (comments.size() >= 2) {
+            showComment(binding.comments2, comments.get(1));
+        }
+
+        if (comments.size() >= 3) {
+            showComment(binding.comments3, comments.get(2));
+        }
+        if (comments.size() >= 4) {
+            binding.textViewMoreComments.setVisibility(View.VISIBLE );
+        }
+    }
+
+    private void showComment(TextView commentTextView, String comment) {
+        if (comment != null){
+            commentTextView.setText(comment);
+            commentTextView.setVisibility(View.VISIBLE);
+
+            // mettre en evidence ses commentaire
+            getCurrentUser(new OnUserFetchListener() {
+                @Override
+                public void onUserFetch(User user) {
+
+                    if (comment.startsWith(user.getUsername()))
+                        commentTextView.setTextColor(Color.BLUE);
+                }
+            });
+
+        }
+    }
+
+    // afficher tous les commentaires
+    public void loadAllComments(View v){
+        showToast("more comments");
+        // popup des commentaire
+        View popupComment = getLayoutInflater().inflate(R.layout.popup_comments, null);
+        RecyclerView commentRecyclerView = popupComment.findViewById(R.id.comments_list_view);
+        commentRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        //adapter
+        CommentsAdapter commentAdapter = new CommentsAdapter(center.getComments());
+        commentRecyclerView.setAdapter(commentAdapter);
+
+        markerDialogBuilder.setView(popupComment).show();
+    }
+
+    private void reservation_grid(String date) {
 
         int hours = 7;
         final String suffix ="H";
@@ -336,6 +400,51 @@ public class SportCenterDetail extends DrawerBaseActivity {
             //System.out.println("Clé: " + key + ", Valeur: " + value);
         }
         return messageToReturn;
+    }
+
+
+    public void postComment(View v){
+        if (currentUser == null) {
+            showToast("must be connected first ");
+        } else {
+            // recuperer l'utilisateur qui a posté le commentaire
+            getCurrentUser(new OnUserFetchListener() {
+                @Override
+                public void onUserFetch(User user) {
+                    //ajouter a la db
+                    FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+                    // Récupérer une référence à l'enregistrement Firestore
+                    DocumentReference documentReference = db.collection("centers").document(center.getNameCenter().toLowerCase());
+
+                    // Créer une Map pour stocker les mises à jour à apporter
+                    Map<String, Object> updates = new HashMap<>();
+                    updates.put("comments", FieldValue.arrayUnion(user.getUsername() + " : " + binding.commentEdittext.getText()));
+
+                    // Mettre à jour l'enregistrement Firestore avec les modifications
+                    documentReference.update(updates)
+                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void v) {
+                                    showToast("comment posted ");
+                                    center.addComment(user.getUsername() + " : " + binding.commentEdittext.getText());
+                                    loadComment();
+                                    binding.commentEdittext.setText(null);
+
+
+                                }
+                            })
+                            .addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    System.out.println("erreur ==> " + e);
+                                    showToast("Error " + e);
+                                }
+                            });
+                }
+            });
+        }
+
     }
 
     public void showToast(String message){
