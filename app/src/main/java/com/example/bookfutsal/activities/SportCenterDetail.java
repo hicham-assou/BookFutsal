@@ -58,6 +58,9 @@ import org.json.JSONObject;
 
 import java.sql.Time;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -67,12 +70,13 @@ import java.util.Locale;
 import java.util.Map;
 
 public class SportCenterDetail extends DrawerBaseActivity {
-    ActivitySportCenterDetailBinding binding;
-    FirebaseAuth mAuth;
-    FirebaseUser currentUser;
-    User userConnected;
-    CalendarView calendar;
-    SportCenter center;
+    private ActivitySportCenterDetailBinding binding;
+    private FirebaseAuth mAuth;
+    private FirebaseUser currentUser;
+    private User userConnected;
+    private CalendarView calendar;
+    private SportCenter center;
+    private int daySelectedInCalendar = 0;
     private AlertDialog.Builder markerDialogBuilder;
 
     @Override
@@ -114,7 +118,7 @@ public class SportCenterDetail extends DrawerBaseActivity {
         binding.infoAddress.setText(center.getAdress());
         binding.infoPhone.setText(center.getPhoneNumber());
         binding.infoHours.setText(showOpeningHours(center.getOpeningHours()));
-        //getInfoWheather(center.getLatitude(), center.getLongitude());
+        getInfoWheather(center.getLatitude(), center.getLongitude());
 
 
         //calendrier
@@ -140,6 +144,11 @@ public class SportCenterDetail extends DrawerBaseActivity {
                 SimpleDateFormat sdf2 = new SimpleDateFormat("dd/MM/yyyy");
                 String formattedDate = sdf2.format(date); // 05/04/2023
 
+                //obtenir la meteo pour le jour appuyé
+                daySelectedInCalendar = getDifferenceDays(formattedDate) * -1; // *-1 pour obtenir la date positif
+                getInfoWheather(center.getLatitude(), center.getLongitude());
+
+                //grid
                 reservation_grid(formattedDate);
 
             }
@@ -150,20 +159,34 @@ public class SportCenterDetail extends DrawerBaseActivity {
 
     }
 
+    // fait grace a chatGPT
+    private int getDifferenceDays(String daySelected) {
+        // Convertir les chaînes de date en LocalDate
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        LocalDate today = LocalDate.now();
+        LocalDate dateSelected = LocalDate.parse(daySelected, formatter);
+
+        // Calculer la différence en nombre de jours
+        long differenceInDays = ChronoUnit.DAYS.between(dateSelected, today);
+        int days = (int) differenceInDays;
+
+        return days;
+    }
+
     // avvir les 3 premiers commentaires
     private void loadComment() {
         List<String> comments = center.getComments();
 
         if (comments.size() >= 1) {
-            showComment(binding.comments1, comments.get(0));
+            showComment(binding.comments1, comments.get(comments.size()-1));
         }
 
         if (comments.size() >= 2) {
-            showComment(binding.comments2, comments.get(1));
+            showComment(binding.comments2, comments.get(comments.size()-2));
         }
 
         if (comments.size() >= 3) {
-            showComment(binding.comments3, comments.get(2));
+            showComment(binding.comments3, comments.get(comments.size()-3));
         }
         if (comments.size() >= 4) {
             binding.textViewMoreComments.setVisibility(View.VISIBLE );
@@ -200,6 +223,54 @@ public class SportCenterDetail extends DrawerBaseActivity {
         commentRecyclerView.setAdapter(commentAdapter);
 
         markerDialogBuilder.setView(popupComment).show();
+    }
+
+    public void postComment(View v){
+        if (currentUser == null) {
+            showToast("must be connected first ");
+        } else {
+            // recuperer l'utilisateur qui a posté le commentaire
+            getCurrentUser(new OnUserFetchListener() {
+                @Override
+                public void onUserFetch(User user) {
+                    //ajouter a la db
+                    FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+                    // Récupérer l'enregistrement Firestore
+                    DocumentReference documentReference = db.collection("centers").document(center.getNameCenter().toLowerCase());
+
+                    // Créer une Map pour stocker les mises à jour à apporter
+                    Map<String, Object> updates = new HashMap<>();
+                    updates.put("comments", FieldValue.arrayUnion(user.getUsername() + " : " + getTime()+ " : " + binding.commentEdittext.getText()));
+
+                    // Mettre à jour l'enregistrement Firestore avec les modifications
+                    documentReference.update(updates)
+                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void v) {
+                                    showToast("comment posted ");
+                                    center.addComment(user.getUsername() + " : "  + getTime()+ " : " + binding.commentEdittext.getText());
+                                    loadComment();
+                                    binding.commentEdittext.setText(null);
+
+                                    //remettre les couleurs de base
+                                    binding.comments1.setTextColor(Color.BLACK);
+                                    binding.comments2.setTextColor(Color.BLACK);
+                                    binding.comments3.setTextColor(Color.BLACK);
+
+
+                                }
+                            })
+                            .addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    showToast("Error " + e);
+                                }
+                            });
+                }
+            });
+        }
+
     }
 
     private void reservation_grid(String date) {
@@ -305,8 +376,6 @@ public class SportCenterDetail extends DrawerBaseActivity {
                 String date = documentSnapshot.getString("date");
                 String hour = documentSnapshot.getString("hour");
 
-                System.out.println("date = " + date);
-                System.out.println("today " + today);
                 if (date.equals(today) && center.getNameCenter().equals(sportCenterName)){
                     // ajouter a la liste si meme jour
                     list.add(new Reservation(hour, sportCenterName, date));
@@ -365,9 +434,12 @@ public class SportCenterDetail extends DrawerBaseActivity {
 
 
     // api meteo
-    /*private void getInfoWheather(double latitude, double longitude) {
+    private void getInfoWheather(double latitude, double longitude) {
+        showToast("differnece de date => "+daySelectedInCalendar);
+        final String apiKey = "9211be69198a3f97d01c865ada5360e4";
         RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
-        String url = "https://api.openweathermap.org/data/2.5/weather?lat="+latitude+"&lon="+longitude+"&appid=9211be69198a3f97d01c865ada5360e4";
+        String url = "https://api.openweathermap.org/data/2.5/weather?lat="+latitude+"&lon="+longitude+"&cnt="+daySelectedInCalendar+"&appid=" + apiKey;
+        //https://api.openweathermap.org/data/2.5/forecast?lat=50.8503396&lon=4.3517103&cnt=3&appid=9211be69198a3f97d01c865ada5360e4
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
@@ -393,7 +465,7 @@ public class SportCenterDetail extends DrawerBaseActivity {
             }
         });
         queue.add(stringRequest);
-    }*/
+    }
 
     private String showOpeningHours(HashMap<String, String> openingHours) {
         String messageToReturn = "";
@@ -401,55 +473,12 @@ public class SportCenterDetail extends DrawerBaseActivity {
             String key = entry.getKey();
             String value = entry.getValue();
             messageToReturn += key + " : " + value + "\n";
-            //System.out.println("Clé: " + key + ", Valeur: " + value);
         }
         return messageToReturn;
     }
 
 
-    public void postComment(View v){
-        if (currentUser == null) {
-            showToast("must be connected first ");
-        } else {
-            // recuperer l'utilisateur qui a posté le commentaire
-            getCurrentUser(new OnUserFetchListener() {
-                @Override
-                public void onUserFetch(User user) {
-                    //ajouter a la db
-                    FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-                    // Récupérer une référence à l'enregistrement Firestore
-                    DocumentReference documentReference = db.collection("centers").document(center.getNameCenter().toLowerCase());
-
-                    // Créer une Map pour stocker les mises à jour à apporter
-                    Map<String, Object> updates = new HashMap<>();
-                    updates.put("comments", FieldValue.arrayUnion(user.getUsername() + " : " + getTime()+ " : " + binding.commentEdittext.getText()));
-
-                    // Mettre à jour l'enregistrement Firestore avec les modifications
-                    documentReference.update(updates)
-                            .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                @Override
-                                public void onSuccess(Void v) {
-                                    showToast("comment posted ");
-                                    center.addComment(user.getUsername() + " : "  + getTime()+ " : " + binding.commentEdittext.getText());
-                                    loadComment();
-                                    binding.commentEdittext.setText(null);
-
-
-                                }
-                            })
-                            .addOnFailureListener(new OnFailureListener() {
-                                @Override
-                                public void onFailure(@NonNull Exception e) {
-                                    System.out.println("erreur ==> " + e);
-                                    showToast("Error " + e);
-                                }
-                            });
-                }
-            });
-        }
-
-    }
 
     private String getTime() {
         Calendar calendar = Calendar.getInstance();

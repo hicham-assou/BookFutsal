@@ -44,7 +44,7 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Commen
 
         String username = parts[0].trim();
         String message = "";
-        String date_hour = ""; //jack : 10/05/2023 16:27:26 : test heure
+        String date_hour = ""; //jack : 10/05/2023 16:27:26 : c'est cool
 
         for (int i = 1; i < 4; i++) {
             date_hour += parts[i].trim() + ":";
