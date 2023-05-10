@@ -2,6 +2,7 @@
 <androidx.cardview.widget.CardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/card_view"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -17,12 +18,10 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
+            android:orientation="horizontal"
             android:padding="16dp">
 
             <TextView
@@ -34,33 +33,44 @@
                 android:textSize="16sp"
                 android:textStyle="bold"/>
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginTop="8dp">
 
-
-                <TextView
-                    android:id="@+id/comment_value"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="comment"
-                    android:textColor="@color/black"
-                    android:textSize="14sp"/>
-
-            </LinearLayout>
-
-            <Button
-                android:id="@+id/button_delete_comment"
+            <TextView
+                android:id="@+id/comment_time"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="end"
-                android:backgroundTint="#AC5D5D"
-                android:text="delete comment "
-                android:visibility="gone"
-                android:textColor="@color/white" />
+                android:layout_marginStart="8dp"
+                android:text="10/10/2002 16:27:26"
+                android:textColor="@color/black"
+                android:textSize="14sp" />
+
         </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="16dp">
+
+            <TextView
+                android:id="@+id/comment_value"
+                android:layout_width="311dp"
+                android:layout_height="36dp"
+                android:text="comment"
+                android:textColor="@color/black"
+                android:textSize="14sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+
+        </LinearLayout>
+        <ImageView
+        android:id="@+id/delete_comment"
+        android:layout_width="34dp"
+        android:layout_height="33dp"
+        android:layout_gravity="end"
+        android:visibility="gone"
+        android:background="@drawable/trash_logo"
+        android:backgroundTint="#AC5D5D" />
     </LinearLayout>
 
 </androidx.cardview.widget.CardView>

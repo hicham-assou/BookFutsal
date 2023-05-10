@@ -56,6 +56,7 @@ import com.google.firebase.storage.StorageReference;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.sql.Time;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -69,6 +70,7 @@ public class SportCenterDetail extends DrawerBaseActivity {
     ActivitySportCenterDetailBinding binding;
     FirebaseAuth mAuth;
     FirebaseUser currentUser;
+    User userConnected;
     CalendarView calendar;
     SportCenter center;
     private AlertDialog.Builder markerDialogBuilder;
@@ -194,7 +196,7 @@ public class SportCenterDetail extends DrawerBaseActivity {
         RecyclerView commentRecyclerView = popupComment.findViewById(R.id.comments_list_view);
         commentRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         //adapter
-        CommentsAdapter commentAdapter = new CommentsAdapter(center.getComments());
+        CommentsAdapter commentAdapter = new CommentsAdapter(center.getComments(), userConnected);
         commentRecyclerView.setAdapter(commentAdapter);
 
         markerDialogBuilder.setView(popupComment).show();
@@ -352,6 +354,8 @@ public class SportCenterDetail extends DrawerBaseActivity {
                     user.setEmail(documentSnapshot.getString("email"));
                     user.setPassword(documentSnapshot.getString("password"));
 
+                    userConnected = user;
+
                     // Appeler la méthode onUserFetch() de l'interface de rappel avec l'objet User
                     listener.onUserFetch(user);
                 }
@@ -419,7 +423,7 @@ public class SportCenterDetail extends DrawerBaseActivity {
 
                     // Créer une Map pour stocker les mises à jour à apporter
                     Map<String, Object> updates = new HashMap<>();
-                    updates.put("comments", FieldValue.arrayUnion(user.getUsername() + " : " + binding.commentEdittext.getText()));
+                    updates.put("comments", FieldValue.arrayUnion(user.getUsername() + " : " + getTime()+ " : " + binding.commentEdittext.getText()));
 
                     // Mettre à jour l'enregistrement Firestore avec les modifications
                     documentReference.update(updates)
@@ -427,7 +431,7 @@ public class SportCenterDetail extends DrawerBaseActivity {
                                 @Override
                                 public void onSuccess(Void v) {
                                     showToast("comment posted ");
-                                    center.addComment(user.getUsername() + " : " + binding.commentEdittext.getText());
+                                    center.addComment(user.getUsername() + " : "  + getTime()+ " : " + binding.commentEdittext.getText());
                                     loadComment();
                                     binding.commentEdittext.setText(null);
 
@@ -445,6 +449,15 @@ public class SportCenterDetail extends DrawerBaseActivity {
             });
         }
 
+    }
+
+    private String getTime() {
+        Calendar calendar = Calendar.getInstance();
+        Date now = calendar.getTime();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+        String currentDateTime = dateFormat.format(now);
+
+        return currentDateTime;
     }
 
     public void showToast(String message){
