@@ -3,8 +3,6 @@ package com.example.bookfutsal.activities;
 import static android.content.ContentValues.TAG;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -15,10 +13,8 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
-import android.widget.Button;
 import android.widget.CalendarView;
 import android.widget.GridLayout;
 import android.widget.TextView;
@@ -435,7 +431,6 @@ public class SportCenterDetail extends DrawerBaseActivity {
 
     // api meteo
     private void getInfoWheather(double latitude, double longitude) {
-        showToast("differnece de date => "+daySelectedInCalendar);
         final String apiKey = "9211be69198a3f97d01c865ada5360e4";
         RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
         String url = "https://api.openweathermap.org/data/2.5/weather?lat="+latitude+"&lon="+longitude+"&cnt="+daySelectedInCalendar+"&appid=" + apiKey;

@@ -1,6 +1,7 @@
 package com.example.bookfutsal.adapter;
 
 import android.annotation.SuppressLint;
+import android.content.DialogInterface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +12,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.bookfutsal.R;
@@ -53,26 +55,34 @@ public class ReservationAdapter extends RecyclerView.Adapter<ReservationAdapter.
         holder.cancelReservationButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //ReservationActivity.cancelReservation(currentReservation);
-
-                String reservationId = currentReservation.getId();
-
-                // supprimer la reservation de la db
-                FirebaseFirestore db = FirebaseFirestore.getInstance();
-                DocumentReference reservationRef = db.collection("reservations").document(reservationId);
-                reservationRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                AlertDialog.Builder builder = new AlertDialog.Builder(holder.itemView.getContext());
+                builder.setTitle("Confirmation");
+                builder.setMessage("Are you sure you want to cancel this reservation?");
+                builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     @Override
-                    public void onSuccess(Void aVoid) {
-                        // refresh la recycleView
-                        int currentPosition = holder.getAdapterPosition(); // utilisation de la variable locale
-                        reservations.remove(currentReservation);
-                        notifyItemRemoved(currentPosition);
-                        notifyItemRangeChanged(currentPosition, reservations.size());
-                        Toast.makeText(holder.itemView.getContext(), "Reservation canceled.", Toast.LENGTH_SHORT).show();
+                    public void onClick(DialogInterface dialog, int which) {
+                        // Annulation de la réservation
+                        String reservationId = currentReservation.getId();
+                        FirebaseFirestore db = FirebaseFirestore.getInstance();
+                        DocumentReference reservationRef = db.collection("reservations").document(reservationId);
+                        reservationRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                int currentPosition = holder.getAdapterPosition();
+                                reservations.remove(currentReservation);
+                                notifyItemRemoved(currentPosition);
+                                notifyItemRangeChanged(currentPosition, reservations.size());
+                                Toast.makeText(holder.itemView.getContext(), "Reservation canceled.", Toast.LENGTH_SHORT).show();
+                            }
+                        });
                     }
                 });
+                builder.setNegativeButton("No", null);
+                AlertDialog dialog = builder.create();
+                dialog.show();
             }
         });
+
 
     }
 

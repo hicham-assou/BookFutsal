@@ -71,10 +71,6 @@ public class ReservationActivity extends DrawerBaseActivity {
                     // ajouter les réservations à la liste de l'adapter
                     adapter.setReservations(reservations);
                 }
-                for (Reservation r: reservations){
-                    System.out.println("date => " + r.getDate());
-                    System.out.println("prix => " + r.getPrice());
-                }
 
             }
         });
