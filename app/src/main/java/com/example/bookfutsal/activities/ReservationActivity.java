@@ -1,36 +1,26 @@
 package com.example.bookfutsal.activities;
 
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.app.AlertDialog;
-import android.content.DialogInterface;
-import android.graphics.Color;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.os.Build;
 import android.os.Bundle;
-import android.util.DisplayMetrics;
-import android.view.Gravity;
 import android.view.View;
-import android.widget.Button;
-import android.widget.GridLayout;
-import android.widget.TableLayout;
-import android.widget.TableRow;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.bookfutsal.R;
 import com.example.bookfutsal.adapter.ReservationAdapter;
-import com.example.bookfutsal.databinding.ActivityMainBinding;
 import com.example.bookfutsal.databinding.ActivityReservationBinding;
 import com.example.bookfutsal.interfaces.ReservationsCallback;
 import com.example.bookfutsal.models.Reservation;
 import com.example.bookfutsal.models.User;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
@@ -44,6 +34,7 @@ public class ReservationActivity extends DrawerBaseActivity {
     FirebaseUser currentUser;
     RecyclerView rvReservations;
     ReservationAdapter adapter;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,6 +66,7 @@ public class ReservationActivity extends DrawerBaseActivity {
             }
         });
     }
+
 
     private void getReservationsOfUser(ReservationsCallback callback) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();

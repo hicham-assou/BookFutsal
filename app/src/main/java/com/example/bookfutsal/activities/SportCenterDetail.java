@@ -3,18 +3,28 @@ package com.example.bookfutsal.activities;
 import static android.content.ContentValues.TAG;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.AlertDialog;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
+import android.widget.Button;
 import android.widget.CalendarView;
 import android.widget.GridLayout;
 import android.widget.TextView;
@@ -74,6 +84,8 @@ public class SportCenterDetail extends DrawerBaseActivity {
     private SportCenter center;
     private int daySelectedInCalendar = 0;
     private AlertDialog.Builder markerDialogBuilder;
+    String channelId = "bookfitsal_channel";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -114,7 +126,7 @@ public class SportCenterDetail extends DrawerBaseActivity {
         binding.infoAddress.setText(center.getAdress());
         binding.infoPhone.setText(center.getPhoneNumber());
         binding.infoHours.setText(showOpeningHours(center.getOpeningHours()));
-        getInfoWheather(center.getLatitude(), center.getLongitude());
+        //getInfoWheather(center.getLatitude(), center.getLongitude());
 
 
         //calendrier
@@ -153,12 +165,60 @@ public class SportCenterDetail extends DrawerBaseActivity {
         //commentaire
         loadComment();
 
+        createNotificationChannel(); // Création du canal de notification
+
+    }
+
+    private void showNotification(String title, String message) {
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, channelId)
+                .setSmallIcon(R.drawable.logo)
+                .setContentTitle(title)
+                .setContentText(message)
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT);
+
+        NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(this);
+        notificationManagerCompat.notify(1, builder.build());
+    }
+    private void createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            CharSequence name = "Reservation";
+            String description = "description";
+            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+
+            NotificationChannel channel = new NotificationChannel(channelId, name, importance);
+            channel.setDescription(description);
+
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(channel);
+        }
     }
 
     // fait grace a chatGPT
     private int getDifferenceDays(String daySelected) {
         // Convertir les chaînes de date en LocalDate
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        DateTimeFormatter formatter = null;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        }
+        LocalDate today = null;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            today = LocalDate.now();
+        }
+        LocalDate dateSelected = null;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            dateSelected = LocalDate.parse(daySelected, formatter);
+        }
+
+        // Calculer la différence en nombre de jours
+        long differenceInDays = 0;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            differenceInDays = ChronoUnit.DAYS.between(dateSelected, today);
+        }
+        int days = (int) differenceInDays;
+
+        return days;
+
+        /*DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         LocalDate today = LocalDate.now();
         LocalDate dateSelected = LocalDate.parse(daySelected, formatter);
 
@@ -166,7 +226,7 @@ public class SportCenterDetail extends DrawerBaseActivity {
         long differenceInDays = ChronoUnit.DAYS.between(dateSelected, today);
         int days = (int) differenceInDays;
 
-        return days;
+        return days;*/
     }
 
     // avvir les 3 premiers commentaires
@@ -339,6 +399,82 @@ public class SportCenterDetail extends DrawerBaseActivity {
                                                         Reservation reservation = new Reservation( hour, center.getNameCenter(), user, date, center.getImage(), center.getPriceHour());
                                                         // Ajouter la réservation à Firestore
                                                         addToFirestore(reservation);
+
+                                                        // ---------------------------------- notification ----------------------------------------
+                                                        // recuperer debut heure reservé (exemple 8h-9h => 8)
+                                                        int startHour = getStartHour(hour);
+                                                        // Récupérer l'heure actuelle
+                                                        /*Calendar calendar = Calendar.getInstance();
+                                                        calendar.setTimeInMillis(System.currentTimeMillis());
+
+                                                        String[] parts = date.split("/");
+                                                        String day = parts[0].trim();
+                                                        String month = parts[1].trim();
+                                                        String year = parts[2].trim();
+                                                        calendar.set(Calendar.YEAR, Integer.parseInt(year)); // Année
+                                                        calendar.set(Calendar.MONTH, Integer.parseInt(month) - 1); // Mois -1 car janvier correspand a 0
+                                                        calendar.set(Calendar.DAY_OF_MONTH, Integer.parseInt(day)); // Jour
+                                                        // Définir l'heure spécifiée dans startHour
+                                                        calendar.set(Calendar.HOUR_OF_DAY, startHour);
+                                                        calendar.set(Calendar.MINUTE, 0); // Réinitialiser les minutes à 0
+                                                        calendar.add(Calendar.MINUTE, -7); // Soustraire 1 minute à l'heure
+
+                                                        // Calculer la différence de temps entre l'heure actuelle et l'heure spécifiée
+                                                        long timeDifference = calendar.getTimeInMillis() - System.currentTimeMillis();
+
+                                                        // Vérifier si la différence de temps est positive (supérieure à 0)
+                                                        if (timeDifference > 0) {
+                                                            // Créer un objet Handler pour afficher la notification une minute avant l'heure spécifiée
+                                                            Handler handler = new Handler();
+                                                            handler.postDelayed(new Runnable() {
+                                                                @Override
+                                                                public void run() {
+                                                                    // Afficher la notification
+                                                                    showNotification("Réservation", "Réservation dans 1 minute");
+                                                                }
+                                                            }, timeDifference);
+                                                        } else {
+                                                            showNotification("Réservation", "heure deja depasse");
+
+                                                        }*/
+
+
+
+                                                        // Récupérer la date et l'heure actuelles
+                                                        Calendar calendar = Calendar.getInstance();
+                                                        calendar.setTimeInMillis(System.currentTimeMillis());
+
+                                                        // Définir la date spécifique exemple => 25/05/2023
+                                                        String[] parts = date.split("/");
+                                                        String day = parts[0].trim();
+                                                        String month = parts[1].trim();
+                                                        String year = parts[2].trim();
+
+                                                        calendar.set(Calendar.YEAR, Integer.parseInt(year)); // Année
+                                                        calendar.set(Calendar.MONTH, Integer.parseInt(month) - 1); // Mois -1 car janvier correspand a 0
+                                                        calendar.set(Calendar.DAY_OF_MONTH, Integer.parseInt(day)); // Jour
+
+                                                        // Définir l'heure spécifique
+                                                        calendar.set(Calendar.HOUR_OF_DAY, startHour); // Heure
+
+                                                        System.out.println( "temps avant la notif => " + (calendar.getTimeInMillis() - System.currentTimeMillis()));
+                                                        // Soustraire 24 heures à la date et l'heure de la reservation
+                                                        int hourBeforNotification = -1;
+                                                        calendar.set(Calendar.MINUTE, 0); // Réinitialiser les minutes à 0
+                                                        calendar.add(Calendar.MINUTE, hourBeforNotification);
+
+                                                        // Créer un objet Handler pour afficher la notification 24 heures avant la date et l'heure spécifiées
+                                                        Handler handler = new Handler();
+                                                        handler.postDelayed(new Runnable() {
+                                                            @Override
+                                                            public void run() {
+                                                                // Afficher la notification
+                                                                showNotification("Reservation", "Reservation dans"+ (hourBeforNotification *-1) + "min ");
+                                                            }
+                                                        }, calendar.getTimeInMillis() - System.currentTimeMillis());
+
+
+
                                                     }
                                                 });
                                                 textView.setBackgroundColor(Color.RED);
@@ -358,6 +494,13 @@ public class SportCenterDetail extends DrawerBaseActivity {
                 });
             }
         }
+    }
+
+    private int getStartHour(String hour) {
+        String[] parts = hour.split("-");
+        String startTime = parts[0].trim();
+        String startTimeWithoutHour = startTime.replaceAll("H", "");
+        return Integer.parseInt(startTimeWithoutHour);
     }
 
     private void getReservations(SportCenter center, String today, ReservationsCallback callback) {
@@ -413,7 +556,7 @@ public class SportCenterDetail extends DrawerBaseActivity {
             @Override
             public void onSuccess(DocumentSnapshot documentSnapshot) {
                 if (documentSnapshot.exists()) {
-                    // Créer une instance de la classe User et initialiser ses attributs
+                    // Créer User et initialiser ses attributs
                     User user = new User();
                     user.setUsername(documentSnapshot.getString("username"));
                     user.setEmail(documentSnapshot.getString("email"));
