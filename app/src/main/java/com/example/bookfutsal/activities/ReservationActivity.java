@@ -24,8 +24,13 @@ import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class ReservationActivity extends DrawerBaseActivity {
 
@@ -34,6 +39,8 @@ public class ReservationActivity extends DrawerBaseActivity {
     FirebaseUser currentUser;
     RecyclerView rvReservations;
     ReservationAdapter adapter;
+    private int currentViewIndex = 0;
+
 
 
     @Override
@@ -90,9 +97,26 @@ public class ReservationActivity extends DrawerBaseActivity {
                     list.add(new Reservation(id, hour, sportCenterName, date, image, price));
                 }
             }
+
+            // Trier la liste par date
+            Collections.sort(list, (reservation1, reservation2) -> {
+                // Convertir les dates en format compatible avec la comparaison
+                SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+                try {
+                    Date date1 = sdf.parse(reservation1.getDate());
+                    Date date2 = sdf.parse(reservation2.getDate());
+                    // Comparer les dates
+                    if (date1 != null && date2 != null) {
+                        return date1.compareTo(date2);
+                    }
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+                return 0;
+            });
             callback.onReservationsReceived(list);
         }).addOnFailureListener(e -> {
-            showToast("Une erreur est survenue lors de la récupération des réservations.");
+            showToast("Error ");
         });
     }
 

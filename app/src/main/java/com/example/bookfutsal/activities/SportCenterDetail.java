@@ -84,7 +84,8 @@ public class SportCenterDetail extends DrawerBaseActivity {
     private SportCenter center;
     private int daySelectedInCalendar = 0;
     private AlertDialog.Builder markerDialogBuilder;
-    String channelId = "bookfitsal_channel";
+    private String channelId = "bookfitsal_channel";
+    private static int notificationIdCounter = 0;
 
 
     @Override
@@ -169,7 +170,14 @@ public class SportCenterDetail extends DrawerBaseActivity {
 
     }
 
+    // Méthode pour générer un identifiant unique pour la notification
+    private int generateUniqueNotificationId() {
+        notificationIdCounter++;
+        return notificationIdCounter;
+    }
+
     private void showNotification(String title, String message) {
+        int uniqueId = generateUniqueNotificationId();
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, channelId)
                 .setSmallIcon(R.drawable.logo)
                 .setContentTitle(title)
@@ -177,7 +185,7 @@ public class SportCenterDetail extends DrawerBaseActivity {
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT);
 
         NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(this);
-        notificationManagerCompat.notify(1, builder.build());
+        notificationManagerCompat.notify(uniqueId, builder.build());
     }
     private void createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -403,42 +411,6 @@ public class SportCenterDetail extends DrawerBaseActivity {
                                                         // ---------------------------------- notification ----------------------------------------
                                                         // recuperer debut heure reservé (exemple 8h-9h => 8)
                                                         int startHour = getStartHour(hour);
-                                                        // Récupérer l'heure actuelle
-                                                        /*Calendar calendar = Calendar.getInstance();
-                                                        calendar.setTimeInMillis(System.currentTimeMillis());
-
-                                                        String[] parts = date.split("/");
-                                                        String day = parts[0].trim();
-                                                        String month = parts[1].trim();
-                                                        String year = parts[2].trim();
-                                                        calendar.set(Calendar.YEAR, Integer.parseInt(year)); // Année
-                                                        calendar.set(Calendar.MONTH, Integer.parseInt(month) - 1); // Mois -1 car janvier correspand a 0
-                                                        calendar.set(Calendar.DAY_OF_MONTH, Integer.parseInt(day)); // Jour
-                                                        // Définir l'heure spécifiée dans startHour
-                                                        calendar.set(Calendar.HOUR_OF_DAY, startHour);
-                                                        calendar.set(Calendar.MINUTE, 0); // Réinitialiser les minutes à 0
-                                                        calendar.add(Calendar.MINUTE, -7); // Soustraire 1 minute à l'heure
-
-                                                        // Calculer la différence de temps entre l'heure actuelle et l'heure spécifiée
-                                                        long timeDifference = calendar.getTimeInMillis() - System.currentTimeMillis();
-
-                                                        // Vérifier si la différence de temps est positive (supérieure à 0)
-                                                        if (timeDifference > 0) {
-                                                            // Créer un objet Handler pour afficher la notification une minute avant l'heure spécifiée
-                                                            Handler handler = new Handler();
-                                                            handler.postDelayed(new Runnable() {
-                                                                @Override
-                                                                public void run() {
-                                                                    // Afficher la notification
-                                                                    showNotification("Réservation", "Réservation dans 1 minute");
-                                                                }
-                                                            }, timeDifference);
-                                                        } else {
-                                                            showNotification("Réservation", "heure deja depasse");
-
-                                                        }*/
-
-
 
                                                         // Récupérer la date et l'heure actuelles
                                                         Calendar calendar = Calendar.getInstance();
@@ -457,23 +429,26 @@ public class SportCenterDetail extends DrawerBaseActivity {
                                                         // Définir l'heure spécifique
                                                         calendar.set(Calendar.HOUR_OF_DAY, startHour); // Heure
 
-                                                        System.out.println( "temps avant la notif => " + (calendar.getTimeInMillis() - System.currentTimeMillis()));
                                                         // Soustraire 24 heures à la date et l'heure de la reservation
-                                                        int hourBeforNotification = -1;
+                                                        int minuteBeforNotification = -1440; // 60 min * 24 => 1440 => 24h
+
                                                         calendar.set(Calendar.MINUTE, 0); // Réinitialiser les minutes à 0
-                                                        calendar.add(Calendar.MINUTE, hourBeforNotification);
+                                                        calendar.add(Calendar.MINUTE, minuteBeforNotification);
 
-                                                        // Créer un objet Handler pour afficher la notification 24 heures avant la date et l'heure spécifiées
-                                                        Handler handler = new Handler();
-                                                        handler.postDelayed(new Runnable() {
-                                                            @Override
-                                                            public void run() {
-                                                                // Afficher la notification
-                                                                showNotification("Reservation", "Reservation dans"+ (hourBeforNotification *-1) + "min ");
-                                                            }
-                                                        }, calendar.getTimeInMillis() - System.currentTimeMillis());
+                                                        // Calculer la différence de temps entre l'heure actuelle et l'heure de la reservation
+                                                        long timeDifference = calendar.getTimeInMillis() - System.currentTimeMillis();
 
-
+                                                        if (timeDifference > 0) {
+                                                            // Créer un objet Handler pour afficher la notification 24 heures avant la date et l'heure spécifiées
+                                                            Handler handler = new Handler();
+                                                            handler.postDelayed(new Runnable() {
+                                                                @Override
+                                                                public void run() {
+                                                                    // Afficher la notification
+                                                                    showNotification("Reservation", "Reservation : " + center.getNameCenter() +" - " + date + " at " + hour);
+                                                                }
+                                                            }, timeDifference);
+                                                        }
 
                                                     }
                                                 });

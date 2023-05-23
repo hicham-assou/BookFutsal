@@ -23,7 +23,12 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.squareup.picasso.Picasso;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class ReservationAdapter extends RecyclerView.Adapter<ReservationAdapter.ReservationViewHolder> {
 
@@ -47,11 +52,31 @@ public class ReservationAdapter extends RecyclerView.Adapter<ReservationAdapter.
         holder.sportCenterName.setText(currentReservation.getSportCenterName());
         holder.date.setText(currentReservation.getDate());
         holder.hour.setText(currentReservation.getHour());
-        System.out.println("adapter sout => " + currentReservation.getImageCenter());
         holder.price.setText(currentReservation.getPrice() + " €");
         // Charger l'image à partir de l'URL avec Picasso
         Picasso.get().load(currentReservation.getImageCenter()).into(holder.imageCenter);
 
+        /// Obtenir la date et l'heure actuelles
+        Calendar calendar = Calendar.getInstance();
+        Date currentDate = calendar.getTime();
+
+        // Convertir la date de la réservation en format compatible avec la comparaison
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+        try {
+            Date reservationDate = sdf.parse(currentReservation.getDate());
+            if (reservationDate != null) {
+                // Comparer la date actuelle avec la date de la réservation
+                if (currentDate.before(reservationDate)) {
+                    holder.cancelReservationButton.setVisibility(View.VISIBLE);
+                } else {
+                    holder.cancelReservationButton.setVisibility(View.GONE);
+                }
+            }
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        // boutton annulation
         holder.cancelReservationButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

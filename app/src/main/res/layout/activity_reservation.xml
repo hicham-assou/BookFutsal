@@ -6,11 +6,10 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".activities.ReservationActivity"> <!--Android Studio Football-->
-
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/reservations_recycler_view"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:clipToPadding="false"
             android:paddingTop="16dp"
             android:paddingBottom="16dp"
@@ -22,7 +21,9 @@
             tools:itemCount="5"
             tools:listitem="@layout/reservation_item" />
 
-        <TextView
+
+
+        <!--<TextView
             android:id="@+id/no_reservations_text_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -33,6 +34,6 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent" />-->
 
 </androidx.constraintlayout.widget.ConstraintLayout>
