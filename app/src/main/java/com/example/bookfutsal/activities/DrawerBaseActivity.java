@@ -21,7 +21,7 @@ import com.google.firebase.auth.FirebaseUser;
 public class DrawerBaseActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     DrawerLayout drawerLayout;
-    MenuItem menuLogin, menuProfile, menuLogout;
+    MenuItem menuLogin, menuLogout;
     FirebaseAuth mAuth;
 
     @Override
@@ -56,7 +56,6 @@ public class DrawerBaseActivity extends AppCompatActivity implements NavigationV
 
         menuLogin = navigationView.getMenu().findItem(R.id.menuLogin);
         menuLogout = navigationView.getMenu().findItem(R.id.menuLogout);
-        menuProfile = navigationView.getMenu().findItem(R.id.menuProfile);
 
     }
 
@@ -87,7 +86,6 @@ public class DrawerBaseActivity extends AppCompatActivity implements NavigationV
         return false;
     }
     public void connected() {
-        menuProfile.setVisible(true);
         menuLogin.setVisible(false);
         menuLogout.setVisible(true);
     }
@@ -95,7 +93,6 @@ public class DrawerBaseActivity extends AppCompatActivity implements NavigationV
     public void disconnected() {
         menuLogin.setVisible(true);
         menuLogout.setVisible(false);
-        menuProfile.setVisible(false);
     }
 
 

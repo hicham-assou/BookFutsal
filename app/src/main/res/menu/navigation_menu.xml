@@ -7,11 +7,6 @@
     </item>
 
     <item
-        android:id="@+id/menuProfile"
-        android:icon="@drawable/ic_baseline_insert_emoticon_24"
-        android:title="@string/profile">
-    </item>
-    <item
         android:id="@+id/menuMyReservations"
         android:icon="@drawable/ic_baseline_calendar_month_24"
         android:title="@string/myReservations"></item>
