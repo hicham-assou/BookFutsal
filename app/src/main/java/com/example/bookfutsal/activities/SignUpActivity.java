@@ -46,48 +46,51 @@ public class SignUpActivity extends DrawerBaseActivity {
             binding.editViewUsername.setError("please enter username");
             binding.editViewUsername.requestFocus();
         }
-        if (password.isEmpty() || password.length() < 6){
+        else if (password.isEmpty() || password.length() < 6){
             binding.editViewPassword.setError("please enter password containing at least 6 characters");
             binding.editViewPassword.requestFocus();
         }
-        if (email.isEmpty()){
+        else if (email.isEmpty()){
             binding.editViewEmail.setError("please enter valid email");
             binding.editViewEmail.requestFocus();
         }
+        else{
+            binding.progressBar.setVisibility(View.VISIBLE);
 
-        binding.progressBar.setVisibility(View.VISIBLE);
-
-        mAuth.createUserWithEmailAndPassword(email, password)
-                .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
-                            //enregister l'user dans Firestore
-                            User user = new User(username, password, email);
-                            dbFirestore.collection("users")
-                                    .document(FirebaseAuth.getInstance().getCurrentUser().getUid())
-                                    .set(user)
-                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                        @Override
-                                        public void onComplete(@NonNull Task<Void> task) {
-                                            if (task.isSuccessful()) {
-                                                showToast("successfully !");
-                                                binding.progressBar.setVisibility(View.GONE);
-                                                // rediriger vers la page de connexion
-                                                startActivity(new Intent(SignUpActivity.this, SignInActivity.class));
-                                                overridePendingTransition(0, 0);
-                                            } else {
-                                                showToast("Failed !");
-                                                binding.progressBar.setVisibility(View.GONE);
+            mAuth.createUserWithEmailAndPassword(email, password)
+                    .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                        @Override
+                        public void onComplete(@NonNull Task<AuthResult> task) {
+                            if (task.isSuccessful()) {
+                                //enregister l'user dans Firestore
+                                User user = new User(username, password, email);
+                                dbFirestore.collection("users")
+                                        .document(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                                        .set(user)
+                                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<Void> task) {
+                                                if (task.isSuccessful()) {
+                                                    showToast("successfully !");
+                                                    binding.progressBar.setVisibility(View.GONE);
+                                                    // rediriger vers la page de connexion
+                                                    startActivity(new Intent(SignUpActivity.this, SignInActivity.class));
+                                                    overridePendingTransition(0, 0);
+                                                } else {
+                                                    showToast("Failed, please enter valid information ");
+                                                    binding.progressBar.setVisibility(View.GONE);
+                                                }
                                             }
-                                        }
-                                    });
-                        } else {
-                            showToast("Failed !");
-                            binding.progressBar.setVisibility(View.GONE);
+                                        });
+                            } else {
+                                showToast("Failed, please enter valid information ");
+                                binding.progressBar.setVisibility(View.GONE);
+                            }
                         }
-                    }
-                });
+                    });
+        }
+
+
 
 
     }
@@ -96,6 +99,13 @@ public class SignUpActivity extends DrawerBaseActivity {
         startActivity(new Intent(this, SignInActivity.class));
         overridePendingTransition(0, 0);
     }
+
+    @Override
+    public void onBackPressed() {
+        startActivity(new Intent(this, SignInActivity.class));
+        overridePendingTransition(0, 0);
+    }
+
     public void showToast(String message){
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }

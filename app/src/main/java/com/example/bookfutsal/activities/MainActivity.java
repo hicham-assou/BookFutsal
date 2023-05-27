@@ -44,6 +44,7 @@ public class MainActivity extends DrawerBaseActivity implements OnMapReadyCallba
 
     private ActivityMainBinding binding;
     private GoogleMap map;
+    private long backPressedTimestamp = 0;
 
 
     private AlertDialog.Builder markerDialogBuilder;
@@ -161,23 +162,6 @@ public class MainActivity extends DrawerBaseActivity implements OnMapReadyCallba
                                             }
                                         })
                                         .show();
-                                /*markerDialogBuilder.setTitle(center.getNameCenter())
-                                        .setMessage(center.getAdress())
-                                        .setPositiveButton("ok", new DialogInterface.OnClickListener() {
-                                            @Override
-                                            public void onClick(DialogInterface dialog, int which) {
-                                                dialog.dismiss();
-                                            }
-                                        })
-                                        .setNegativeButton("more details", new DialogInterface.OnClickListener() {
-                                            @Override
-                                            public void onClick(DialogInterface dialog, int which) {
-                                                Intent intent = new Intent(MainActivity.this, SportCenterDetail.class);
-                                                intent.putExtra("center", center);
-                                                startActivity(intent);
-                                            }
-                                        })
-                                        .show();*/
                             }
                             return true;
                         }
@@ -193,6 +177,21 @@ public class MainActivity extends DrawerBaseActivity implements OnMapReadyCallba
         });
 
     }
+
+    @Override
+    public void onBackPressed() {
+        // il faut appuyer 2fois pour quitter l'application
+        long currentTime = System.currentTimeMillis();
+
+        if (currentTime - backPressedTimestamp > 2000) {
+            Toast.makeText(this, "Press again to exit", Toast.LENGTH_SHORT).show();
+            backPressedTimestamp = currentTime;
+        } else {
+            // Fermer completement l'application
+            finishAffinity();
+        }
+    }
+
 
     public void showToast(String message){
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show();

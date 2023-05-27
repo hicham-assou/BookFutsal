@@ -7,6 +7,8 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.view.MenuItem;
 import android.view.View;
@@ -23,13 +25,14 @@ public class DrawerBaseActivity extends AppCompatActivity implements NavigationV
     DrawerLayout drawerLayout;
     MenuItem menuLogin, menuLogout;
     FirebaseAuth mAuth;
+    FirebaseUser currentUser;
 
     @Override
     protected void onStart() {
         super.onStart();
         // check si utilisateur est connecté
         mAuth = FirebaseAuth.getInstance();
-        FirebaseUser currentUser = mAuth.getCurrentUser();
+        currentUser = mAuth.getCurrentUser();
 
         if (currentUser == null) {
             disconnected();
@@ -65,8 +68,12 @@ public class DrawerBaseActivity extends AppCompatActivity implements NavigationV
 
         switch (item.getItemId()){
             case R.id.menuMyReservations:
-                startActivity(new Intent(this, ReservationActivity.class));
-                overridePendingTransition(0, 0);
+                if (currentUser == null) {
+                    showToast("you must be connected first ");
+                } else {
+                    startActivity(new Intent(this, ReservationActivity.class));
+                    overridePendingTransition(0, 0);
+                }
                 break;
             case R.id.menuHome:
                 startActivity(new Intent(this, MainActivity.class));
@@ -77,11 +84,26 @@ public class DrawerBaseActivity extends AppCompatActivity implements NavigationV
                 overridePendingTransition(0, 0);
                 break;
             case R.id.menuLogout:
-                mAuth.signOut();
-                disconnected();
-                showToast("disconnected");
-                finish();
+                //s'assuer quil veut bien se deconnecter
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setTitle("LogOut");
+                builder.setMessage("Are you sure you want to disconnect ?");
+                builder.setPositiveButton("Logout", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        mAuth.signOut();
+                        disconnected();
+                        showToast("Disconnected");
+                        finish();
+                        startActivity(new Intent(DrawerBaseActivity.this, MainActivity.class));
+                        overridePendingTransition(0, 0);
+                    }
+                });
+                builder.setNegativeButton("Cancel", null);
+                AlertDialog dialog = builder.create();
+                dialog.show();
                 break;
+
         }
         return false;
     }

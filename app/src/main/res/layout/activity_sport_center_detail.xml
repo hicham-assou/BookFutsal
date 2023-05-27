@@ -186,7 +186,7 @@
 
                 </LinearLayout>
             </LinearLayout>
-            <!-- Commentaires et évaluations -->
+            <!-- Commentaires  -->
             <LinearLayout
                 android:id="@+id/reviews_layout"
                 android:layout_width="match_parent"
@@ -213,6 +213,7 @@
                     android:id="@+id/reviews_button"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:backgroundTint="#007BFF"
                     android:onClick="postComment"
                     android:text="Post"/>
 
@@ -253,10 +254,10 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="More comments"
+                    android:textColor="#007BFF"
                     android:layout_gravity="center"
-                    android:visibility="gone"
                     android:onClick="loadAllComments"
-                    />
+                    /><!--android:visibility="gone"-->
 
             </LinearLayout>
         </LinearLayout>

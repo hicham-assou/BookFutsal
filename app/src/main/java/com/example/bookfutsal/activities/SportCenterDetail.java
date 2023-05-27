@@ -13,7 +13,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.app.AlertDialog;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -84,8 +86,10 @@ public class SportCenterDetail extends DrawerBaseActivity {
     private SportCenter center;
     private int daySelectedInCalendar = 0;
     private AlertDialog.Builder markerDialogBuilder;
-    private String channelId = "bookfitsal_channel";
+    private final String channelId = "bookfitsal_channel";
     private static int notificationIdCounter = 0;
+    private static SportCenterDetail currentActivity;
+
 
 
     @Override
@@ -93,6 +97,9 @@ public class SportCenterDetail extends DrawerBaseActivity {
         super.onCreate(savedInstanceState);
         binding = ActivitySportCenterDetailBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
+        //activity actuelle
+        currentActivity = this;
 
         markerDialogBuilder = new AlertDialog.Builder(this);
 
@@ -127,7 +134,7 @@ public class SportCenterDetail extends DrawerBaseActivity {
         binding.infoAddress.setText(center.getAdress());
         binding.infoPhone.setText(center.getPhoneNumber());
         binding.infoHours.setText(showOpeningHours(center.getOpeningHours()));
-        //getInfoWheather(center.getLatitude(), center.getLongitude());
+        getInfoWheather(center.getLatitude(), center.getLongitude());
 
 
         //calendrier
@@ -177,12 +184,20 @@ public class SportCenterDetail extends DrawerBaseActivity {
     }
 
     private void showNotification(String title, String message) {
+        // appuye sur la notif
+        Intent intent = new Intent(this, ReservationActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TASK);
+
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_ONE_SHOT|PendingIntent.FLAG_IMMUTABLE);
+
         int uniqueId = generateUniqueNotificationId();
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, channelId)
                 .setSmallIcon(R.drawable.logo)
                 .setContentTitle(title)
                 .setContentText(message)
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT);
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setContentIntent(pendingIntent)
+                .setAutoCancel(true);
 
         NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(this);
         notificationManagerCompat.notify(uniqueId, builder.build());
@@ -225,16 +240,6 @@ public class SportCenterDetail extends DrawerBaseActivity {
         int days = (int) differenceInDays;
 
         return days;
-
-        /*DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-        LocalDate today = LocalDate.now();
-        LocalDate dateSelected = LocalDate.parse(daySelected, formatter);
-
-        // Calculer la différence en nombre de jours
-        long differenceInDays = ChronoUnit.DAYS.between(dateSelected, today);
-        int days = (int) differenceInDays;
-
-        return days;*/
     }
 
     // avvir les 3 premiers commentaires
@@ -252,9 +257,6 @@ public class SportCenterDetail extends DrawerBaseActivity {
         if (comments.size() >= 3) {
             showComment(binding.comments3, comments.get(comments.size()-3));
         }
-        if (comments.size() >= 4) {
-            binding.textViewMoreComments.setVisibility(View.VISIBLE );
-        }
     }
 
     private void showComment(TextView commentTextView, String comment) {
@@ -263,27 +265,30 @@ public class SportCenterDetail extends DrawerBaseActivity {
             commentTextView.setVisibility(View.VISIBLE);
 
             // mettre en evidence ses commentaire
-            getCurrentUser(new OnUserFetchListener() {
-                @Override
-                public void onUserFetch(User user) {
+            if (currentUser != null) {
+                getCurrentUser(new OnUserFetchListener() {
+                    @Override
+                    public void onUserFetch(User user) {
 
-                    if (comment.startsWith(user.getUsername()))
-                        commentTextView.setTextColor(Color.BLUE);
-                }
-            });
+                        if (comment.startsWith(user.getUsername()))
+                            commentTextView.setTextColor(Color.BLUE);
+                    }
+                });
+            }
+
 
         }
     }
 
     // afficher tous les commentaires
     public void loadAllComments(View v){
-        showToast("more comments");
         // popup des commentaire
         View popupComment = getLayoutInflater().inflate(R.layout.popup_comments, null);
         RecyclerView commentRecyclerView = popupComment.findViewById(R.id.comments_list_view);
         commentRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+
         //adapter
-        CommentsAdapter commentAdapter = new CommentsAdapter(center.getComments(), userConnected);
+        CommentsAdapter commentAdapter = new CommentsAdapter(center, center.getComments(), userConnected);
         commentRecyclerView.setAdapter(commentAdapter);
 
         markerDialogBuilder.setView(popupComment).show();
@@ -294,45 +299,53 @@ public class SportCenterDetail extends DrawerBaseActivity {
             showToast("must be connected first ");
         } else {
             // recuperer l'utilisateur qui a posté le commentaire
-            getCurrentUser(new OnUserFetchListener() {
-                @Override
-                public void onUserFetch(User user) {
-                    //ajouter a la db
-                    FirebaseFirestore db = FirebaseFirestore.getInstance();
+            if (currentUser != null){
+                if (binding.commentEdittext.getText().toString().isEmpty()){
+                    showToast("You should write your comment first ...");
+                }else{
+                    getCurrentUser(new OnUserFetchListener() {
+                        @Override
+                        public void onUserFetch(User user) {
+                            //ajouter a la db
+                            FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-                    // Récupérer l'enregistrement Firestore
-                    DocumentReference documentReference = db.collection("centers").document(center.getNameCenter().toLowerCase());
+                            // Récupérer l'enregistrement Firestore
+                            DocumentReference documentReference = db.collection("centers").document(center.getNameCenter().toLowerCase());
 
-                    // Créer une Map pour stocker les mises à jour à apporter
-                    Map<String, Object> updates = new HashMap<>();
-                    updates.put("comments", FieldValue.arrayUnion(user.getUsername() + " : " + getTime()+ " : " + binding.commentEdittext.getText()));
+                            // Créer une Map pour stocker les mises à jour à apporter
+                            Map<String, Object> updates = new HashMap<>();
+                            updates.put("comments", FieldValue.arrayUnion(user.getUsername() + " : " + getTime()+ " : " + binding.commentEdittext.getText()));
 
-                    // Mettre à jour l'enregistrement Firestore avec les modifications
-                    documentReference.update(updates)
-                            .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                @Override
-                                public void onSuccess(Void v) {
-                                    showToast("comment posted ");
-                                    center.addComment(user.getUsername() + " : "  + getTime()+ " : " + binding.commentEdittext.getText());
-                                    loadComment();
-                                    binding.commentEdittext.setText(null);
+                            // Mettre à jour l'enregistrment
+                            documentReference.update(updates)
+                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void v) {
+                                            showToast("comment posted ");
+                                            center.addComment(user.getUsername() + " : "  + getTime()+ " : " + binding.commentEdittext.getText());
+                                            loadComment();
+                                            binding.commentEdittext.setText(null);
 
-                                    //remettre les couleurs de base
-                                    binding.comments1.setTextColor(Color.BLACK);
-                                    binding.comments2.setTextColor(Color.BLACK);
-                                    binding.comments3.setTextColor(Color.BLACK);
+                                            //remettre les couleurs de base
+                                            binding.comments1.setTextColor(Color.BLACK);
+                                            binding.comments2.setTextColor(Color.BLACK);
+                                            binding.comments3.setTextColor(Color.BLACK);
 
 
-                                }
-                            })
-                            .addOnFailureListener(new OnFailureListener() {
-                                @Override
-                                public void onFailure(@NonNull Exception e) {
-                                    showToast("Error " + e);
-                                }
-                            });
+                                        }
+                                    })
+                                    .addOnFailureListener(new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e) {
+                                            showToast("Error " + e);
+                                        }
+                                    });
+                        }
+                    });
                 }
-            });
+
+            }
+
         }
 
     }
@@ -399,60 +412,63 @@ public class SportCenterDetail extends DrawerBaseActivity {
                                             if (currentUser == null) {
                                                 showToast("must be connected first ");
                                             } else {
-                                                String hour = (String) textView.getText();
-                                                getCurrentUser(new OnUserFetchListener() {
-                                                    @Override
-                                                    public void onUserFetch(User user) {
+                                                if (currentUser != null){
+                                                    String hour = (String) textView.getText();
+                                                    getCurrentUser(new OnUserFetchListener() {
+                                                        @Override
+                                                        public void onUserFetch(User user) {
 
-                                                        Reservation reservation = new Reservation( hour, center.getNameCenter(), user, date, center.getImage(), center.getPriceHour());
-                                                        // Ajouter la réservation à Firestore
-                                                        addToFirestore(reservation);
+                                                            Reservation reservation = new Reservation( hour, center.getNameCenter(), user, date, center.getImage(), center.getPriceHour());
+                                                            // Ajouter la réservation à Firestore
+                                                            addToFirestore(reservation);
 
-                                                        // ---------------------------------- notification ----------------------------------------
-                                                        // recuperer debut heure reservé (exemple 8h-9h => 8)
-                                                        int startHour = getStartHour(hour);
+                                                            // ---------------------------------- notification ----------------------------------------
 
-                                                        // Récupérer la date et l'heure actuelles
-                                                        Calendar calendar = Calendar.getInstance();
-                                                        calendar.setTimeInMillis(System.currentTimeMillis());
+                                                            // recuperer debut heure reservé (exemple 8h-9h => 8)
+                                                            int startHour = getStartHour(hour);
 
-                                                        // Définir la date spécifique exemple => 25/05/2023
-                                                        String[] parts = date.split("/");
-                                                        String day = parts[0].trim();
-                                                        String month = parts[1].trim();
-                                                        String year = parts[2].trim();
+                                                            // Récupérer la date et l'heure actuelles
+                                                            Calendar calendar = Calendar.getInstance();
+                                                            calendar.setTimeInMillis(System.currentTimeMillis());
 
-                                                        calendar.set(Calendar.YEAR, Integer.parseInt(year)); // Année
-                                                        calendar.set(Calendar.MONTH, Integer.parseInt(month) - 1); // Mois -1 car janvier correspand a 0
-                                                        calendar.set(Calendar.DAY_OF_MONTH, Integer.parseInt(day)); // Jour
+                                                            // Définir la date spécifique exemple => 25/05/2023
+                                                            String[] parts = date.split("/");
+                                                            String day = parts[0].trim();
+                                                            String month = parts[1].trim();
+                                                            String year = parts[2].trim();
 
-                                                        // Définir l'heure spécifique
-                                                        calendar.set(Calendar.HOUR_OF_DAY, startHour); // Heure
+                                                            calendar.set(Calendar.YEAR, Integer.parseInt(year)); // Année
+                                                            calendar.set(Calendar.MONTH, Integer.parseInt(month) - 1); // Mois -1 car janvier correspand a 0
+                                                            calendar.set(Calendar.DAY_OF_MONTH, Integer.parseInt(day)); // Jour
 
-                                                        // Soustraire 24 heures à la date et l'heure de la reservation
-                                                        int minuteBeforNotification = -1440; // 60 min * 24 => 1440 => 24h
+                                                            // Définir l'heure spécifique
+                                                            calendar.set(Calendar.HOUR_OF_DAY, startHour); // Heure
 
-                                                        calendar.set(Calendar.MINUTE, 0); // Réinitialiser les minutes à 0
-                                                        calendar.add(Calendar.MINUTE, minuteBeforNotification);
+                                                            // Soustraire 24 heures à la date et l'heure de la reservation
+                                                            int minuteBeforNotification = -1440; // 60 min * 24 => 1440 => 24h
 
-                                                        // Calculer la différence de temps entre l'heure actuelle et l'heure de la reservation
-                                                        long timeDifference = calendar.getTimeInMillis() - System.currentTimeMillis();
+                                                            calendar.set(Calendar.MINUTE, 0); // Réinitialiser les minutes à 0
+                                                            calendar.add(Calendar.MINUTE, minuteBeforNotification);
 
-                                                        if (timeDifference > 0) {
-                                                            // Créer un objet Handler pour afficher la notification 24 heures avant la date et l'heure spécifiées
-                                                            Handler handler = new Handler();
-                                                            handler.postDelayed(new Runnable() {
-                                                                @Override
-                                                                public void run() {
-                                                                    // Afficher la notification
-                                                                    showNotification("Reservation", "Reservation : " + center.getNameCenter() +" - " + date + " at " + hour);
-                                                                }
-                                                            }, timeDifference);
+                                                            // Calculer la différence de temps entre l'heure actuelle et l'heure de la reservation
+                                                            long timeDifference = calendar.getTimeInMillis() - System.currentTimeMillis();
+
+                                                            if (timeDifference > 0) {
+                                                                // Créer un objet Handler pour afficher la notification 24 heures avant la date et l'heure spécifiées
+                                                                Handler handler = new Handler();
+                                                                handler.postDelayed(new Runnable() {
+                                                                    @Override
+                                                                    public void run() {
+                                                                        // Afficher la notification
+                                                                        showNotification("Reservation", "Reservation : " + center.getNameCenter() +" - " + date + " at " + hour);
+                                                                    }
+                                                                }, timeDifference);
+                                                            }
                                                         }
+                                                    });
+                                                    textView.setBackgroundColor(Color.RED);
+                                                }
 
-                                                    }
-                                                });
-                                                textView.setBackgroundColor(Color.RED);
                                             }
                                         }
                                     })
@@ -497,17 +513,17 @@ public class SportCenterDetail extends DrawerBaseActivity {
             }
             callback.onReservationsReceived(list);
         }).addOnFailureListener(e -> {
-            // Gérer l'erreur ici, si nécessaire
+            showToast("Error");
         });
     }
 
     private void addToFirestore(Reservation reservation) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-        // Créez une référence à une nouvelle collection "reservations"
+        // Créez collection "reservations"
         CollectionReference reservationsRef = db.collection("reservations");
 
-        // Créez un nouveau document dans la collection "reservations"
+        // Créez un nouveau document
         reservationsRef.add(reservation)
                 .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                     @Override
@@ -600,6 +616,15 @@ public class SportCenterDetail extends DrawerBaseActivity {
         String currentDateTime = dateFormat.format(now);
 
         return currentDateTime;
+    }
+
+    public static void refresh(){
+        currentActivity.recreate();
+    }
+    @Override
+    public void onBackPressed() {
+        startActivity(new Intent(this, MainActivity.class));
+        overridePendingTransition(0, 0);
     }
 
     public void showToast(String message){

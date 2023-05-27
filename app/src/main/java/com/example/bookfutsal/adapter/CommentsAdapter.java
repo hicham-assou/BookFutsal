@@ -1,5 +1,6 @@
 package com.example.bookfutsal.adapter;
 
+import android.content.DialogInterface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,25 +10,37 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.bookfutsal.R;
+import com.example.bookfutsal.activities.SportCenterDetail;
+import com.example.bookfutsal.models.SportCenter;
 import com.example.bookfutsal.models.User;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import kotlin.jvm.internal.SpreadBuilder;
 
 public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.CommentViewHolder> {
 
+    SportCenter center;
     private List<String> commentList;
     private User user;
 
-    public CommentsAdapter(List<String> commentList, User user) {
+    public CommentsAdapter(SportCenter center, List<String> commentList, User user) {
+        this.center = center;
         this.commentList = commentList;
         this.user = user;
     }
+
 
     @NonNull
     @Override
@@ -58,13 +71,50 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Commen
             }
         }
 
-        System.out.println("user => " + user.getUsername());
         holder.bind(username , message, date_hour, user);
 
         holder.delete_comment.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(v.getContext(), "coming soon", Toast.LENGTH_SHORT).show();
+                AlertDialog.Builder builder = new AlertDialog.Builder(holder.itemView.getContext());
+                builder.setTitle("Confirmation");
+                builder.setMessage("Are you sure you want to delete this comment ?");
+                builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        int position = holder.getAdapterPosition();
+                        if (position != RecyclerView.NO_POSITION) {
+                            String comment = commentList.get(position);
+                            commentList.remove(position);
+                            notifyItemRemoved(position);
+
+                            // Supprimer le commentaire de la db
+                            FirebaseFirestore db = FirebaseFirestore.getInstance();
+                            DocumentReference documentReference = db.collection("centers").document(center.getNameCenter().toLowerCase());
+                            Map<String, Object> updates = new HashMap<>();
+                            updates.put("comments", FieldValue.arrayRemove(comment));
+                            documentReference.update(updates)
+                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void vv) {
+                                            Toast.makeText(v.getContext(), "Comment deleted", Toast.LENGTH_SHORT).show();
+                                            // Rafraîchir l'activité
+                                            SportCenterDetail.refresh();
+                                        }
+                                    })
+                                    .addOnFailureListener(new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e) {
+                                            Toast.makeText(v.getContext(), "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
+                        }
+                    }
+                });
+                builder.setNegativeButton("No", null);
+                AlertDialog dialog = builder.create();
+                dialog.show();
+
             }
         });
 
@@ -96,9 +146,15 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Commen
             commentTextViewName.setText(name);
             commentTimeTextView.setText(time);
 
-            if (name.equals(user.getUsername())){
-                delete_comment.setVisibility(View.VISIBLE);
+            if (user != null){
+                if (name.equals(user.getUsername())){
+                    delete_comment.setVisibility(View.VISIBLE);
+                    System.out.println("name " + name + " user " + user.getUsername());
+                }
+
             }
+
+
         }
     }
 }

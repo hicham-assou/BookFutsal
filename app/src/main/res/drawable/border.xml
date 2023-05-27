@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="#F5F5F5" /> <!-- Couleur de fond de l'encadrement -->
+    <stroke
+        android:width="2dp"
+    android:color="#007BFF" /> <!-- Couleur de la bordure -->
+    <corners android:radius="8dp" /> <!-- Rayon des coins de l'encadrement -->
+    <padding
+        android:left="2dp"
+        android:top="2dp"
+        android:right="2dp"
+        android:bottom="2dp" /> <!-- Marge intérieure de l'encadrement -->
+</shape>
+
