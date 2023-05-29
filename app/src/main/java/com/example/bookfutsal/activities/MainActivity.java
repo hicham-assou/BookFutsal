@@ -3,9 +3,14 @@ package com.example.bookfutsal.activities;
 import static android.content.ContentValues.TAG;
 
 import androidx.appcompat.app.AlertDialog;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
+import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -58,6 +63,12 @@ public class MainActivity extends DrawerBaseActivity implements OnMapReadyCallba
         allocateActivityTitle("Book Futsal");
 
 
+        //pour les notif
+        if (Build.VERSION.SDK_INT >= 33) {
+            if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.POST_NOTIFICATIONS}, 101);
+            }
+        }
 
         // Obtenir la carte depuis la vue XML
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
